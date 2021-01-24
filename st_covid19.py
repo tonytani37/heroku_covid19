@@ -89,9 +89,6 @@ hd1, lb1 = ax1.get_legend_handles_labels()
 hd2, lb2 = ax2.get_legend_handles_labels()
 # 凡例をまとめて出力する
 ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
-# d_list = [a for a in range(0,240,30)]
-# d_list.append(239)
-# plt.xticks(d_list)
 plt.grid(True)
 
 st.title('COVID-19 全国感染者情報')
@@ -115,4 +112,8 @@ st.dataframe(df_a.style.highlight_max(axis=0),width=900,height=400)
 
 st.write(
     'https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    )
+
+st.write(
+    'ソース：https://raw.githubusercontent.com/tonytani37/heroku_covid19/master/st_covid19.py'
     )
