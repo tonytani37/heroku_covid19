@@ -13,9 +13,13 @@ url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/sum
 
 try:
     r = requests.get(url)
-    summary_json = json.loads(r.text)
+    with open(json_name, mode='w') as f:
+        f.write(r.text)
 except requests.exceptions.RequestException as err:
     print(err)
+
+f = open(json_name,'r')
+summary_json = json.load(f)
 
 collist = [
         'date',
@@ -49,8 +53,11 @@ datalist = [
 
 df = pd.DataFrame(datalist,columns=collist)
 
+df.to_csv('summary.csv')
+
 update = summary_json['updated'][:10]
 
+df = pd.read_csv('summary.csv')
 df = df.drop(0)
 
 df_a = df[['date','confirmed','confirmedAvg7d']].copy()
@@ -69,6 +76,7 @@ df_d = pd.to_datetime(df_a['日付'])
 df_a = df_a.drop('日付',axis=1)
 df_a = df_a.fillna(0).astype(int)
 df_a['日付'] = df_d
+
 
 fig, ax1 = plt.subplots(figsize=(12,8))
 ax2 = ax1.twinx()
@@ -103,6 +111,21 @@ st.write(
 st.write(
     px.bar(df_a.tail(240),x='日付',y="検査数",title='検査数')
 )
+# f = open(json_name,'r')
+# summary_json = json.load(f)
+
+# data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
+# data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
+# data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
+
+# df_pre = pd.DataFrame(data_d)
+
+# st.write(
+#     px.line(df_pre)
+# )
+
+# st.dataframe(df_pre)
+
 
 st.write('COVID-19感染者関連データ')
 st.dataframe(df_a.style.highlight_max(axis=0),width=900,height=400)
