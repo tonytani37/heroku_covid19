@@ -7,7 +7,7 @@ import requests
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 
-json_name = 'json/summary.json'
+json_name = 'summary.json'
 
 url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
@@ -53,11 +53,11 @@ datalist = [
 
 df = pd.DataFrame(datalist,columns=collist)
 
-df.to_csv('json/summary.csv')
+df.to_csv('summary.csv')
 
 update = summary_json['updated'][:10]
 
-df = pd.read_csv('json/summary.csv')
+df = pd.read_csv('summary.csv')
 df = df.drop(0)
 
 df_a = df[['date','confirmed','confirmedAvg7d']].copy()
