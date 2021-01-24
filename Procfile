@@ -1,1 +1,0 @@
-web: streamlit run st_covid19.py
