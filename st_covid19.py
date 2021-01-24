@@ -51,8 +51,8 @@ update = summary_json['updated'][:10]
 
 df = df.drop(0)
 
-df_a = df[['date','confirmed','confirmedAvg7d']].copy()
-df_ｃ = df['confirmedAvg7d'].copy()
+df_a = df[['date','confirmed','confirmedAvg7d']].copy() #dataframeはcopyしないとワーニングが出る
+df_ｃ = df['confirmedAvg7d'].copy() #dataframeはcopyしないとワーニングが出る
 
 df_t = df['testedCumulative'].diff()
 
