@@ -111,9 +111,9 @@ st.write('COVID-19感染者関連データ')
 st.dataframe(df_a.style.highlight_max(axis=0),width=900,height=400)
 
 st.write(
-    'https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    'データ: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
     )
 
 st.write(
-    'ソース：https://raw.githubusercontent.com/tonytani37/heroku_covid19/master/st_covid19.py'
+    'ソース: https://raw.githubusercontent.com/tonytani37/heroku_covid19/master/st_covid19.py'
     )
