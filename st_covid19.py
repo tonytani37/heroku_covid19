@@ -70,11 +70,13 @@ df_a = df_a.drop('日付',axis=1)
 df_a = df_a.fillna(0).astype(int)
 df_a['日付'] = df_d
 
+days = 240 #グラフ化する日数指定
+
 fig, ax1 = plt.subplots(figsize=(12,8))
 ax2 = ax1.twinx()
-# ax1.bar(df_a['日付'].tail(240),df_a['感染者数'].tail(240),label='日次感染者数',color='lightgray')
-ax1.plot(df_a['日付'].tail(240),df_a['感染者数移動平均'].tail(240),label='感染者数移動平均',color='red')
-ax2.plot(df_a['日付'].tail(240),df_a['検査数移動平均'].tail(240),label='検査数移動平均',color='green')
+ax1.bar(df_a['日付'].tail(days),df_a['感染者数'].tail(days),label='日次感染者数',color='lightgray')
+ax1.plot(df_a['日付'].tail(days),df_a['感染者数移動平均'].tail(days),label='感染者数移動平均',color='red')
+ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),label='検査数移動平均',color='green')
 
 title = "国内感染者数推移（日毎 移動平均)  {}".format(update)
 ax1.set_title(title)
@@ -95,7 +97,11 @@ plt.grid(True)
 st.title('COVID-19 全国感染者情報')
 st.write('このサイトはStreamlitで作成しています')
 
+st.write('matplotlib')
+
 st.pyplot(fig)
+
+st.write('plotly')
 
 st.write(
     px.bar(df_a.tail(240),x='日付',y="感染者数",title='感染者数')
