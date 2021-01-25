@@ -96,18 +96,186 @@ plt.grid(True)
 #### matplotlib
 """
 
+"""
+### 都道府県別感染者者数（移動平均）
+"""
+
 st.pyplot(fig)
 
+#
+
+data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
+data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
+data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
+
+import datetime as dt
+
+s_day = '2020-01-08' #開始日
+# s_day = '2020-01-18' #開始日
+
+
+date_time = dt.datetime.today()
+today = date_time.strftime("%Y-%m-%d")
+date_index = pd.date_range(s_day , today, freq="d")
+date_idx = ["{0:%Y-%m-%d}".format(row) for row in date_index]
+df_date = pd.DataFrame(date_idx,columns=['日付'])
+
+df_date = df_date['日付']
+df_n = pd.DataFrame(data_n)
+
+df_l = pd.DataFrame(data_l,columns=df_date)
+df_l['name_ja'] = df_n
+# df_l = df_l.set_index('name_ja')
+df_sum = df_l.sum(axis=1)
+df_l['sum'] = df_sum
+df_l = df_l.fillna(0)
+
+df_d = pd.DataFrame(data_d,columns=df_date)
+df_d['name_ja'] = df_n
+# df_d = df_d.set_index('name_ja')
+df_sum = df_d.sum(axis=1)
+df_d['sum'] = df_sum
+df_d = df_d.fillna(0)
+
+
+marker_s = [
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s", 
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s", 
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s",
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s",
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s",
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s",
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s",
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s",
+            "p", 
+            "^", 
+            "1", 
+            "8", 
+            "s"
+            ]
+
+# 都道府県別死亡者数
+
+df = df_d[df_d['sum'] > 300]
+df = df.head(12)
+idx = len(df)
+
+df_name = df_d['name_ja']
+df_c = df.drop(['name_ja','sum'],axis=1)
+df_col = df_c.columns.values
+
+day = 100
+day_m = 0 - day
+df_col = df_col[day_m:]
+df_col = pd.to_datetime(df_col).copy()
+
+# df_c = df_c.astype(int).copy()
+
+# df_c.to_csv('json/test.csv')
+
+fig1, ax1 = plt.subplots(figsize=(12,8))
+
+for i in range(idx):
+    if not df_name[i] == 'ダイヤモンド・プリンセス' and not df_name[i] == '長崎のクルーズ船' and not df_name[i] == '空港検疫':
+        df_1 = df_c.iloc[i]
+        df_2 = df_1.rolling(7).mean()
+        df_2 = df_2[day_m:]
+        ax1.plot(df_col,df_2,label=df_name[i],linewidth=2,marker=marker_s[i])
+
+plt.grid()
+ax1.set_title('都道府県別死亡者数（移動平均） ')
+ax1.set_xlabel('日付')
+ax1.set_ylabel('死亡者数')
+plt.legend(loc='upper left')
+
 """
-#### plotly
+### 都道府県別死亡者数（移動平均）
 """
 
-st.write(
-    px.bar(df_a.tail(240),x='日付',y="感染者数",title='感染者数')
-)
-st.write(
-    px.bar(df_a.tail(240),x='日付',y="検査数",title='検査数')
-)
+st.pyplot(fig1)
+
+
+df = df_l[df_l['sum'] > 1000]
+df = df.head(10)
+idx = len(df)
+
+df_name = df_l['name_ja']
+df_l = df.drop(['name_ja','sum'],axis=1)
+df_col = df_c.columns.values
+
+day = 100
+day_m = 0 - day
+df_col = df_col[day_m:]
+df_col = pd.to_datetime(df_col).copy()
+
+
+fig2, ax1 = plt.subplots(figsize=(12,8))
+
+for i in range(idx):
+    if not df_name[i] == 'ダイヤモンド・プリンセス' and not df_name[i] == '長崎のクルーズ船' and not df_name[i] == '空港検疫':
+        df_1 = df_l.iloc[i]
+        df_2 = df_1.rolling(7).mean()
+        df_2 = df_2[day_m:]
+        ax1.plot(df_col,df_2,label=df_name[i],linewidth=2,marker=marker_s[i])
+
+# mem_list = [a for a in range(0,day,14)]
+# # plt.xticks([0,7,15,22,29])
+# plt.xticks(mem_list)
+
+plt.grid()
+ax1.set_title('都道府県別感染者数（移動平均） ')
+ax1.set_xlabel('日付')
+ax1.set_ylabel('感染者数')
+plt.legend(loc='upper left')
+
+"""
+### 都道府県別感染者者数（移動平均）
+"""
+
+st.pyplot(fig2)
+
+# """
+# #### plotly
+# """
+
+# st.write(
+#     px.bar(df_a.tail(240),x='日付',y="感染者数",title='感染者数')
+# )
+# st.write(
+#     px.bar(df_a.tail(240),x='日付',y="検査数",title='検査数')
+# )
 
 """
 ### COVID-19感染者関連データ
