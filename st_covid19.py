@@ -69,20 +69,20 @@ df_a = df_a.drop('日付',axis=1)
 df_a = df_a.fillna(0).astype(int)
 df_a['日付'] = df_d
 
-days = 240 #グラフ化する日数指定
+days = 360 #グラフ化する日数指定
 
 fig, ax1 = plt.subplots(figsize=(12,8))
 ax2 = ax1.twinx()
 ax1.bar(df_a['日付'].tail(days),df_a['感染者数'].tail(days),label='日次感染者数',color='lightgray')
-ax1.plot(df_a['日付'].tail(days),df_a['感染者数移動平均'].tail(days),label='感染者数移動平均',color='red')
-ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),label='検査数移動平均',color='green')
+ax1.plot(df_a['日付'].tail(days),df_a['感染者数移動平均'].tail(days),label='感染者数移動平均',color='red',linewidth=2)
+ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),label='検査数移動平均',color='green',linewidth=2)
 
 title = "国内感染者数推移（日毎 移動平均)  {}".format(update)
 ax1.set_title(title)
 
 ax1.set_xlabel('日付')
-ax1.set_ylabel("7日平均感染者数")
-ax2.set_ylabel("7日平均検査者数")
+ax1.set_ylabel("7日平均感染者数（人）")
+ax2.set_ylabel("7日平均検査者数（件）")
 
 hd1, lb1 = ax1.get_legend_handles_labels()
 hd2, lb2 = ax2.get_legend_handles_labels()
@@ -90,17 +90,17 @@ hd2, lb2 = ax2.get_legend_handles_labels()
 ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
 plt.grid(True)
 
-"""
-# COVID-19 全国感染者情報
-### このサイトはStreamlitで作成し、Herokuで動いています
-#### matplotlib
-"""
+# """
+# # COVID-19 全国感染者情報
+# ### このサイトはStreamlitで作成し、Herokuで動いています
+# #### matplotlib
+# """
 
-"""
-### 全国感染者者数（移動平均）
-"""
+# """
+# ### 全国感染者者数（移動平均）
+# """
 
-st.pyplot(fig)
+# st.pyplot(fig)
 
 #
 
@@ -110,7 +110,7 @@ data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死
 
 import datetime as dt
 
-s_day = '2020-01-08' #開始日
+s_day = '2020-01-09' #開始日
 # s_day = '2020-01-18' #開始日
 
 
@@ -189,15 +189,15 @@ marker_s = [
 # 都道府県別死亡者数
 
 df = df_d[df_d['sum'] > 300]
-df = df.head(12)
+df = df.head(10)
 idx = len(df)
 
 df_name = df_d['name_ja']
 df_c = df.drop(['name_ja','sum'],axis=1)
 df_col = df_c.columns.values
 
-day = 100
-day_m = 0 - day
+# days = 240
+day_m = 0 - days
 df_col = df_col[day_m:]
 df_col = pd.to_datetime(df_col).copy()
 
@@ -212,31 +212,32 @@ for i in range(idx):
         df_1 = df_c.iloc[i]
         df_2 = df_1.rolling(7).mean()
         df_2 = df_2[day_m:]
-        ax1.plot(df_col,df_2,label=df_name[i],linewidth=2,marker=marker_s[i])
+        # ax1.plot(df_col,df_2,label=df_name[i],linewidth=2,marker=marker_s[i])
+        ax1.plot(df_col,df_2,label=df_name[i],linewidth=2)
 
 plt.grid()
 ax1.set_title('都道府県別死亡者数（移動平均） ')
 ax1.set_xlabel('日付')
-ax1.set_ylabel('死亡者数')
+ax1.set_ylabel('死亡者数（人）')
 plt.legend(loc='upper left')
 
-"""
-### 都道府県別死亡者数（移動平均）
-"""
+# """
+# ### 都道府県別死亡者数（移動平均）
+# """
 
-st.pyplot(fig1)
+# st.pyplot(fig1)
 
 
 df = df_l[df_l['sum'] > 1000]
-df = df.head(10)
+df = df.head(7)
 idx = len(df)
 
 df_name = df_l['name_ja']
 df_l = df.drop(['name_ja','sum'],axis=1)
 df_col = df_c.columns.values
 
-day = 100
-day_m = 0 - day
+# days = 240
+day_m = 0 - days
 df_col = df_col[day_m:]
 df_col = pd.to_datetime(df_col).copy()
 
@@ -248,7 +249,9 @@ for i in range(idx):
         df_1 = df_l.iloc[i]
         df_2 = df_1.rolling(7).mean()
         df_2 = df_2[day_m:]
-        ax1.plot(df_col,df_2,label=df_name[i],linewidth=2,marker=marker_s[i])
+        # ax1.plot(df_col,df_2,label=df_name[i],linewidth=2,marker=marker_s[i])
+        ax1.plot(df_col,df_2,label=df_name[i],linewidth=2)
+
 
 # mem_list = [a for a in range(0,day,14)]
 # # plt.xticks([0,7,15,22,29])
@@ -257,14 +260,14 @@ for i in range(idx):
 plt.grid()
 ax1.set_title('都道府県別感染者数（移動平均） ')
 ax1.set_xlabel('日付')
-ax1.set_ylabel('感染者数')
+ax1.set_ylabel('感染者数（人）')
 plt.legend(loc='upper left')
 
-"""
-### 都道府県別感染者者数（移動平均）
-"""
+# """
+# ### 都道府県別感染者者数（移動平均）
+# """
 
-st.pyplot(fig2)
+# st.pyplot(fig2)
 
 # """
 # #### plotly
@@ -276,6 +279,31 @@ st.pyplot(fig2)
 # st.write(
 #     px.bar(df_a.tail(240),x='日付',y="検査数",title='検査数')
 # )
+
+"""
+# COVID-19 全国感染者情報
+### このサイトはStreamlitで作成し、Herokuで動いています
+#### matplotlib
+"""
+
+"""
+### 全国感染者者数（移動平均）
+"""
+
+st.pyplot(fig)
+
+"""
+### 都道府県別感染者者数（移動平均）
+"""
+
+st.pyplot(fig2)
+
+"""
+### 都道府県別死亡者数（移動平均）
+"""
+
+st.pyplot(fig1)
+
 
 """
 ### COVID-19感染者関連データ
