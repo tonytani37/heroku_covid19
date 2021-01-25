@@ -69,7 +69,7 @@ df_a = df_a.drop('日付',axis=1)
 df_a = df_a.fillna(0).astype(int)
 df_a['日付'] = df_d
 
-days = 350 #グラフ化する日数指定
+days = 300 #グラフ化する日数指定
 
 fig, ax1 = plt.subplots(figsize=(12,8))
 ax2 = ax1.twinx()
