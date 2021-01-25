@@ -197,7 +197,7 @@ df_name = df_d['name_ja']
 df_c = df.drop(['name_ja','sum'],axis=1)
 df_col = df_c.columns.values
 
-days = 300
+# days = 300
 day_m = 0 - days
 df_col = df_col[day_m:]
 df_col = pd.to_datetime(df_col).copy()
