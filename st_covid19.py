@@ -92,7 +92,7 @@ plt.grid(True)
 
 """
 # COVID-19 全国感染者情報
-### このサイトはStreamlitで作成しています
+### このサイトはStreamlitで作成し、Herokuで動いています
 #### matplotlib
 """
 
