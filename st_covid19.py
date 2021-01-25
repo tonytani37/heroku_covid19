@@ -216,7 +216,7 @@ for i in range(idx):
         ax1.plot(df_col,df_2,label=df_name[i],linewidth=2)
 
 plt.grid()
-ax1.set_title('都道府県別死亡者数（移動平均） ')
+ax1.set_title('都道府県別死亡者数（移動平均） {}'.format(update))
 ax1.set_xlabel('日付')
 ax1.set_ylabel('死亡者数（人）')
 plt.legend(loc='upper left')
@@ -258,7 +258,7 @@ for i in range(idx):
 # plt.xticks(mem_list)
 
 plt.grid()
-ax1.set_title('都道府県別感染者数（移動平均） ')
+ax1.set_title('都道府県別感染者数（移動平均） {}'.format(update))
 ax1.set_xlabel('日付')
 ax1.set_ylabel('感染者数（人）')
 plt.legend(loc='upper left')
