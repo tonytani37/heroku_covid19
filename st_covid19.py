@@ -6,6 +6,7 @@ import json
 import requests
 import matplotlib.pyplot as plt
 import japanize_matplotlib
+from datetime import datetime, timedelta, timezone
 
 url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
@@ -113,8 +114,8 @@ import datetime as dt
 s_day = '2020-01-09' #開始日
 # s_day = '2020-01-18' #開始日
 
-
-date_time = dt.datetime.today()
+JST = timezone(timedelta(hours=+9), 'JST')
+date_time = dt.datetime.now(JST)
 today = date_time.strftime("%Y-%m-%d")
 date_index = pd.date_range(s_day , today, freq="d")
 date_idx = ["{0:%Y-%m-%d}".format(row) for row in date_index]
@@ -196,7 +197,7 @@ df_name = df_d['name_ja']
 df_c = df.drop(['name_ja','sum'],axis=1)
 df_col = df_c.columns.values
 
-# days = 240
+days = 300
 day_m = 0 - days
 df_col = df_col[day_m:]
 df_col = pd.to_datetime(df_col).copy()
