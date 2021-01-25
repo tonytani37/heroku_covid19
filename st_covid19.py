@@ -61,9 +61,10 @@ df_a['検査数'] = df_t
 df_a['検査数移動平均'] = df_ta
 
 df_a = df_a.rename(
+    # columns={'confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
     columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
 
-df_d = pd.to_datetime(df_a['日付'])
+df_d = pd.to_datetime(df_a['日付']).copy()
 df_a = df_a.drop('日付',axis=1)
 df_a = df_a.fillna(0).astype(int)
 df_a['日付'] = df_d
@@ -89,14 +90,17 @@ hd2, lb2 = ax2.get_legend_handles_labels()
 ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
 plt.grid(True)
 
-st.title('COVID-19 全国感染者情報')
-st.write('このサイトはStreamlitで作成しています')
-
-st.write('matplotlib')
+"""
+# COVID-19 全国感染者情報
+### このサイトはStreamlitで作成しています
+#### matplotlib
+"""
 
 st.pyplot(fig)
 
-st.write('plotly')
+"""
+#### plotly
+"""
 
 st.write(
     px.bar(df_a.tail(240),x='日付',y="感染者数",title='感染者数')
@@ -105,8 +109,11 @@ st.write(
     px.bar(df_a.tail(240),x='日付',y="検査数",title='検査数')
 )
 
-st.write('COVID-19感染者関連データ')
-st.dataframe(df_a.style.highlight_max(axis=0),width=900,height=400)
+"""
+### COVID-19感染者関連データ
+"""
+
+st.dataframe(df_a[['日付','感染者数','検査数','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),width=900,height=400)
 
 st.write(
     'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
