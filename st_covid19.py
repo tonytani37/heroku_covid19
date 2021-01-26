@@ -310,11 +310,11 @@ st.pyplot(fig)
 ### 国内重症者累計推移
 """
 
-# st.pyplot(fig3)
+st.pyplot(fig3)
 
-st.write(
-    px.line(df_a.tail(days),x='日付',y='重症者累計',title='重症者累計')
-)
+# st.write(
+#     px.line(df_a.tail(days),x='日付',y='重症者累計',title='重症者累計')
+# )
 
 """
 ### 都道府県別感染者数（移動平均）
