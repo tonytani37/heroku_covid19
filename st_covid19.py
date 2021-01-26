@@ -117,7 +117,7 @@ s_day = '2020-01-18' #開始日
 
 # JST = timezone(timedelta(hours=+9), 'JST')
 # date_time = dt.datetime.now(JST)
-date_time = pd.to_datetime(df_d.iloc[0])
+date_time = pd.to_datetime(df_d.iloc[-1])
 today = date_time.strftime("%Y-%m-%d")
 date_index = pd.date_range(s_day , today, freq="d")
 date_idx = ["{0:%Y-%m-%d}".format(row) for row in date_index]
