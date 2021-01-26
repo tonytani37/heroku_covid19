@@ -94,17 +94,17 @@ plt.grid(True)
 
 df_cr = df[['date',"criticalCumulative"]]
 
-df_a = df_cr.rename(
-    columns={'date':'日付','critical':'重症者数',"criticalCumulative":'重症者累計'})
+df_b = df_cr.rename(
+    columns={'date':'日付',"criticalCumulative":'重症者累計'})
 
-df_d = pd.to_datetime(df_a['日付'])
-df_a = df_a.drop('日付',axis=1)
-df_a = df_a.fillna(0).astype(int)
-df_a['日付'] = df_d
+df_d = pd.to_datetime(df_b['日付'])
+df_b = df_b.drop('日付',axis=1)
+df_b = df_b.fillna(0).astype(int)
+df_b['日付'] = df_d
 
 fig3, ax1 = plt.subplots(figsize=(12,8))
 
-ax1.plot(df_a['日付'].tail(240),df_a['重症者累計'].tail(240),label='重症者累計',color='green')
+ax1.plot(df_b['日付'].tail(240),df_b['重症者累計'].tail(240),label='重症者累計',color='green')
 
 title = "国内重傷者累計推移 {}".format(update)
 ax1.set_title(title)
