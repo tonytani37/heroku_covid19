@@ -52,7 +52,7 @@ update = summary_json['updated'][:10]
 
 df = df.drop(0)
 
-df_a = df[['date','confirmed','confirmedAvg7d']].copy() #dataframeはcopyしないとワーニングが出る
+df_a = df[['date','confirmed','confirmedAvg7d',"criticalCumulative"]].copy() #dataframeはcopyしないとワーニングが出る
 df_ｃ = df['confirmedAvg7d'].copy() #dataframeはcopyしないとワーニングが出る
 
 df_t = df['testedCumulative'].diff()
@@ -63,7 +63,7 @@ df_a['検査数移動平均'] = df_ta
 
 df_a = df_a.rename(
     # columns={'confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
-    columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
+    columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者累計'})
 
 df_d = pd.to_datetime(df_a['日付']).copy()
 df_a = df_a.drop('日付',axis=1)
@@ -92,19 +92,19 @@ hd2, lb2 = ax2.get_legend_handles_labels()
 ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
 plt.grid(True)
 
-df_cr = df[['date',"criticalCumulative"]]
+# df_cr = df[['date',"criticalCumulative"]]
 
-df_b = df_cr.rename(
-    columns={'date':'日付',"criticalCumulative":'重症者累計'})
+# df_b = df_cr.rename(
+#     columns={'date':'日付',"criticalCumulative":'重症者累計'})
 
-df_d = pd.to_datetime(df_b['日付'])
-df_b = df_b.drop('日付',axis=1)
-df_b = df_b.fillna(0).astype(int)
-df_b['日付'] = df_d
+df_d = pd.to_datetime(df_a['日付'])
+df_a = df_a.drop('日付',axis=1)
+df_a = df_a.fillna(0).astype(int)
+df_a['日付'] = df_d
 
 fig3, ax1 = plt.subplots(figsize=(12,8))
 
-ax1.plot(df_b['日付'].tail(240),df_b['重症者累計'].tail(240),label='重症者累計',color='green')
+ax1.plot(df_a['日付'].tail(240),df_a['重症者累計'].tail(240),label='重症者累計',color='green')
 
 title = "国内重傷者累計推移 {}".format(update)
 ax1.set_title(title)
@@ -310,7 +310,7 @@ st.pyplot(fig)
 ### 国内重症者累計推移
 """
 
-st.pyplot(fig3)
+# st.pyplot(fig3)
 
 st.write(
     px.line(df_b.tail(240),x='日付',y='重症者累計',title='重症者累計')
