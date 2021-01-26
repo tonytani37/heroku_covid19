@@ -296,12 +296,12 @@ plt.legend(loc='upper left')
 
 """
 # COVID-19 全国感染者情報
-### このサイトはStreamlitで作成し、Herokuで動いています
+### このサイトはStreamlitで作成したものをHerokuで公開しています
 #### matplotlib
 """
 
 """
-### 国内感染者者数（移動平均）
+### 国内感染者数（移動平均）
 """
 
 st.pyplot(fig)
@@ -311,6 +311,10 @@ st.pyplot(fig)
 """
 
 st.pyplot(fig3)
+
+st.write(
+    px.bar(df_b.tail(240),x='日付',y='重症者累計',title='重症者累計')
+)
 
 """
 ### 都道府県別感染者者数（移動平均）
