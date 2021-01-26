@@ -313,7 +313,7 @@ st.pyplot(fig)
 # st.pyplot(fig3)
 
 st.write(
-    px.line(df_b.tail(240),x='日付',y='重症者累計',title='重症者累計')
+    px.line(df_a.tail(240),x='日付',y='重症者累計',title='重症者累計')
 )
 
 """
