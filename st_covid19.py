@@ -69,6 +69,7 @@ df_d = pd.to_datetime(df_a['日付']).copy()
 df_a = df_a.drop('日付',axis=1)
 df_a = df_a.fillna(0).astype(int)
 df_a['日付'] = df_d
+df_df = df_d.iloc[0]
 
 days = 300 #グラフ化する日数指定
 
@@ -114,8 +115,9 @@ import datetime as dt
 s_day = '2020-01-09' #開始日
 # s_day = '2020-01-18' #開始日
 
-JST = timezone(timedelta(hours=+9), 'JST')
-date_time = dt.datetime.now(JST)
+# JST = timezone(timedelta(hours=+9), 'JST')
+# date_time = dt.datetime.now(JST)
+date_time = df_df
 today = date_time.strftime("%Y-%m-%d")
 date_index = pd.date_range(s_day , today, freq="d")
 date_idx = ["{0:%Y-%m-%d}".format(row) for row in date_index]
