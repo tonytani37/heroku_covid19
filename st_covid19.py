@@ -106,7 +106,7 @@ fig3, ax1 = plt.subplots(figsize=(12,8))
 
 ax1.plot(df_a['日付'].tail(240),df_a['重症者累計'].tail(240),label='重症者累計',color='green')
 
-title = "国内重傷者累計推移 {}".format(update))
+title = "国内重傷者累計推移 {}".format(update)
 ax1.set_title(title)
 
 ax1.set_xlabel('日付')
