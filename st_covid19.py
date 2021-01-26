@@ -92,19 +92,30 @@ hd2, lb2 = ax2.get_legend_handles_labels()
 ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
 plt.grid(True)
 
-# """
-# # COVID-19 全国感染者情報
-# ### このサイトはStreamlitで作成し、Herokuで動いています
-# #### matplotlib
-# """
+df_cr = df[['date',"criticalCumulative"]]
 
-# """
-# ### 全国感染者者数（移動平均）
-# """
+df_a = df_cr.rename(
+    columns={'date':'日付','critical':'重症者数',"criticalCumulative":'重症者累計'})
 
-# st.pyplot(fig)
+df_d = pd.to_datetime(df_a['日付'])
+df_a = df_a.drop('日付',axis=1)
+df_a = df_a.fillna(0).astype(int)
+df_a['日付'] = df_d
 
-#
+fig3, ax1 = plt.subplots(figsize=(12,8))
+
+ax1.plot(df_a['日付'].tail(240),df_a['重症者累計'].tail(240),label='重症者累計',color='green')
+
+title = "国内重傷者累計推移 {}".format(update))
+ax1.set_title(title)
+
+ax1.set_xlabel('日付')
+ax1.set_ylabel("重傷者累計数")
+
+hd1, lb1 = ax1.get_legend_handles_labels()
+ax1.legend()
+plt.grid(True)
+
 
 data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
 data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
@@ -294,6 +305,12 @@ plt.legend(loc='upper left')
 """
 
 st.pyplot(fig)
+
+"""
+### 全国重症者累計数推移
+"""
+
+st.pyplot(fig3)
 
 """
 ### 都道府県別感染者者数（移動平均）
