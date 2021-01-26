@@ -112,8 +112,8 @@ data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死
 
 import datetime as dt
 
-# s_day = '2020-01-09' #開始日
-s_day = '2020-01-18' #開始日
+s_day = '2020-01-08' #開始日
+# s_day = '2020-01-18' #開始日
 
 # JST = timezone(timedelta(hours=+9), 'JST')
 # date_time = dt.datetime.now(JST)
