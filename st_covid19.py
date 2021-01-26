@@ -333,7 +333,7 @@ st.pyplot(fig1)
 ### COVID-19感染者関連データ
 """
 
-st.dataframe(df_a[['日付','感染者数','検査数','重症者累計','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),width=900,height=400)
+st.dataframe(df_a[['日付','感染者数','検査数','重症者累計','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
 
 st.write(
     'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
