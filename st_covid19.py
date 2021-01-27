@@ -92,7 +92,7 @@ ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),labe
 # ax1.vlines(ymin=min(df_a['感染者数'].tail(days)),ymax=max(df_a['感染者数'].tail(days)),x=datetime(2020,10,1),color='gray',linestyles='dashed')
 # ax1.vlines(ymin=min(df_a['感染者数'].tail(days)),ymax=max(df_a['感染者数'].tail(days)),x=datetime(2020,7,22),color='gray',linestyles='dashed')
 
-start_date = df_a['日付'].head(1)
+start_date = df_a['日付'][0][0]
 
 if start_date < datetime(2021,1,8):
     plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
