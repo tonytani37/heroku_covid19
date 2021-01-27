@@ -116,6 +116,35 @@ hd1, lb1 = ax1.get_legend_handles_labels()
 ax1.legend()
 plt.grid(True)
 
+"""
+# COVID-19 全国感染者情報
+### このサイトはStreamlitで作成したものをHerokuで公開しています
+#### matplotlib
+"""
+
+"""
+### 国内感染者数（移動平均）
+"""
+
+st.pyplot(fig)
+
+"""
+### 国内重症者累計推移
+"""
+
+st.pyplot(fig3)
+
+"""
+### COVID-19感染者関連データ
+"""
+
+st.dataframe(df_a[['日付','感染者数','検査数','重症者累計','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
+
+st.write(
+    'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    )
+
+#　都道府県別グラフ　元データ作成タイミングで時々クラッシュする
 
 data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
 data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
@@ -294,23 +323,6 @@ plt.legend(loc='upper left')
 #     px.bar(df_a.tail(240),x='日付',y="検査数",title='検査数')
 # )
 
-"""
-# COVID-19 全国感染者情報
-### このサイトはStreamlitで作成したものをHerokuで公開しています
-#### matplotlib
-"""
-
-"""
-### 国内感染者数（移動平均）
-"""
-
-st.pyplot(fig)
-
-"""
-### 国内重症者累計推移
-"""
-
-st.pyplot(fig3)
 
 # st.write(
 #     px.line(df_a.tail(days),x='日付',y='重症者累計',title='重症者累計')
@@ -329,15 +341,6 @@ st.pyplot(fig2)
 st.pyplot(fig1)
 
 
-"""
-### COVID-19感染者関連データ
-"""
-
-st.dataframe(df_a[['日付','感染者数','検査数','重症者累計','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
-
-st.write(
-    'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
-    )
 
 # st.write(
 #     'ソース: https://raw.githubusercontent.com/tonytani37/heroku_covid19/master/st_covid19.py'
