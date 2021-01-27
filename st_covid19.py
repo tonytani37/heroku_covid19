@@ -142,7 +142,6 @@ ax1.set_title(title)
 ax1.set_xlabel('日付')
 ax1.set_ylabel("重傷者（人）")
 
-hd1, lb1 = ax1.get_legend_handles_labels()
 ax1.legend()
 plt.grid(True)
 
