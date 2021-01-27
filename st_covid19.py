@@ -66,11 +66,12 @@ df_a = df_a.rename(
     columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者累計'}
     )
 
-df_show = df_a.copy()
-
+df_bd = df_a['日付'].copy()
 df_d = pd.to_datetime(df_a['日付']).copy()
 df_a = df_a.drop('日付',axis=1)
 df_a = df_a.fillna(0).astype(int)
+df_show = df_a.copy()
+df_show['日付'] = df_bd
 df_a['日付'] = df_d
 # df_df = df_d.iloc[0]
 
