@@ -144,8 +144,6 @@ st.write(
     'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
     )
 
-#　都道府県別グラフ　元データ作成タイミングで時々クラッシュする
-
 data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
 data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
 data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
