@@ -83,29 +83,12 @@ ax1.bar(df_a['日付'].tail(days),df_a['感染者数'].tail(days),label='日次�
 ax1.plot(df_a['日付'].tail(days),df_a['感染者数移動平均'].tail(days),label='感染者数移動平均',color='red',linewidth=2)
 ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),label='検査数移動平均',color='green',linewidth=2)
 
-# ax1.vlines(ymin=min(df_a['感染者数'].tail(days)),ymax=max(df_a['感染者数'].tail(days)),x=datetime(2021,1,8),color='red',linestyles='dashed')
-# ax1.vlines(ymin=min(df_a['感染者数'].tail(days)),ymax=max(df_a['感染者数'].tail(days)),x=datetime(2021,1,22),color='green',linestyles='dashed')
-
-# ax1.vlines(ymin=min(df_a['感染者数'].tail(days)),ymax=max(df_a['感染者数'].tail(days)),x=datetime(2020,4,7),color='red',linestyles='dashed')
-# ax1.vlines(ymin=min(df_a['感染者数'].tail(days)),ymax=max(df_a['感染者数'].tail(days)),x=datetime(2020,4,21),color='green',linestyles='dashed')
-
-# ax1.vlines(ymin=min(df_a['感染者数'].tail(days)),ymax=max(df_a['感染者数'].tail(days)),x=datetime(2020,10,1),color='gray',linestyles='dashed')
-# ax1.vlines(ymin=min(df_a['感染者数'].tail(days)),ymax=max(df_a['感染者数'].tail(days)),x=datetime(2020,7,22),color='gray',linestyles='dashed')
-
-start_date = df_a['日付'][0][0]
-
-if start_date < datetime(2021,1,8):
-    plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
-if start_date < datetime(2021,1,22):
-    plt.axvline(x=datetime(2021,1,22), color='red', ls='--')
-if start_date < datetime(2020,3,7):
-    plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
-if start_date < datetime(2020,4,21):
-    plt.axvline(x=datetime(2020,4,21), color='red', ls='--')
-if start_date < datetime(2020,10,1):
-    plt.axvline(x=datetime(2020,10,1), color='red', ls='--')
-if start_date < datetime(2020,7,22):
-    plt.axvline(x=datetime(2020,7,22), color='red', ls='--')
+plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
+plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
+plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
+plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
+plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
+plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
 
     
 title = "国内感染者数推移（日毎 移動平均)  {}".format(update)
@@ -135,14 +118,12 @@ fig3, ax1 = plt.subplots(figsize=(12,8))
 
 ax1.plot(df_a['日付'].tail(days),df_a['重症者数'].tail(days),label='重症者数',color='green')
 
-ax1.vlines(ymin=min(df_a['重症者数'].tail(days)),ymax=max(df_a['重症者数'].tail(days)),x=datetime(2021,1,8),color='red',linestyles='dashed')
-ax1.vlines(ymin=min(df_a['重症者数'].tail(days)),ymax=max(df_a['重症者数'].tail(days)),x=datetime(2021,1,22),color='green',linestyles='dashed')
-
-ax1.vlines(ymin=min(df_a['重症者数'].tail(days)),ymax=max(df_a['重症者数'].tail(days)),x=datetime(2020,4,7),color='red',linestyles='dashed')
-ax1.vlines(ymin=min(df_a['重症者数'].tail(days)),ymax=max(df_a['重症者数'].tail(days)),x=datetime(2020,4,21),color='green',linestyles='dashed')
-
-ax1.vlines(ymin=min(df_a['重症者数'].tail(days)),ymax=max(df_a['重症者数'].tail(days)),x=datetime(2020,10,1),color='gray',linestyles='dashed')
-ax1.vlines(ymin=min(df_a['重症者数'].tail(days)),ymax=max(df_a['重症者数'].tail(days)),x=datetime(2020,7,22),color='gray',linestyles='dashed')
+plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
+plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
+plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
+plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
+plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
+plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
 
 title = "国内重傷者数推移 {}".format(update)
 ax1.set_title(title)
