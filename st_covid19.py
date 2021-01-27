@@ -137,14 +137,14 @@ df_date = pd.DataFrame(date_idx,columns=['日付'])
 df_date = df_date['日付']
 df_n = pd.DataFrame(data_n)
 
-df_l = pd.DataFrame(data_l[-days],columns=df_date.tail(days))
+df_l = pd.DataFrame(data_l,columns=df_date)
 df_l['name_ja'] = df_n.tail(days).copy()
 # df_l = df_l.set_index('name_ja')
 df_sum = df_l.sum(axis=1)
 df_l['sum'] = df_sum
 df_l = df_l.fillna(0)
 
-df_d = pd.DataFrame(data_d[-days],columns=df_date.tail(days))
+df_d = pd.DataFrame(data_d,columns=df_date)
 df_d['name_ja'] = df_n.tail(days).copy()
 # df_d = df_d.set_index('name_ja')
 df_sum = df_d.sum(axis=1)
