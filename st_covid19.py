@@ -83,13 +83,18 @@ ax1.bar(df_a['日付'].tail(days),df_a['感染者数'].tail(days),label='日次�
 ax1.plot(df_a['日付'].tail(days),df_a['感染者数移動平均'].tail(days),label='感染者数移動平均',color='red',linewidth=2)
 ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),label='検査数移動平均',color='green',linewidth=2)
 
-plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
-plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
-plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
-plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
-plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
-plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
-
+if datetime(2020,4,7) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
+if datetime(2020,4,21) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
+if datetime(2020,10,1) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
+if datetime(2020,7,22) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
+if datetime(2021,1,8) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
+if datetime(2021,1,22) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
     
 title = "国内感染者数推移（日毎 移動平均)  {}".format(update)
 ax1.set_title(title)
@@ -118,12 +123,18 @@ fig3, ax1 = plt.subplots(figsize=(12,8))
 
 ax1.plot(df_a['日付'].tail(days),df_a['重症者数'].tail(days),label='重症者数',color='green')
 
-plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
-plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
-plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
-plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
-plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
-plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
+if datetime(2020,4,7) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
+if datetime(2020,4,21) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
+if datetime(2020,10,1) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
+if datetime(2020,7,22) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
+if datetime(2021,1,8) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
+if datetime(2021,1,22) > min(df_a['日付'].tail(days)):
+    plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
 
 title = "国内重傷者数推移 {}".format(update)
 ax1.set_title(title)
