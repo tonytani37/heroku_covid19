@@ -63,7 +63,10 @@ df_a['検査数移動平均'] = df_ta
 
 df_a = df_a.rename(
     # columns={'confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
-    columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者累計'})
+    columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者累計'}
+    )
+
+df_show = df_a.copy()
 
 df_d = pd.to_datetime(df_a['日付']).copy()
 df_a = df_a.drop('日付',axis=1)
@@ -138,7 +141,7 @@ st.pyplot(fig3)
 ### COVID-19感染者関連データ
 """
 
-st.dataframe(df_a[['日付','感染者数','検査数','重症者累計','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
+st.dataframe(df_show[['日付','感染者数','検査数','重症者累計','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
 
 st.write(
     'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
