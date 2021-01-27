@@ -63,7 +63,7 @@ df_a['検査数移動平均'] = df_ta
 
 df_a = df_a.rename(
     # columns={'confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
-    columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者累計'}
+    columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者数'}
     )
 
 df_bd = df_a['日付'].copy()
@@ -99,7 +99,7 @@ plt.grid(True)
 # df_cr = df[['date',"criticalCumulative"]]
 
 # df_b = df_cr.rename(
-#     columns={'date':'日付',"criticalCumulative":'重症者累計'})
+#     columns={'date':'日付',"criticalCumulative":'重症者数'})
 
 df_d = pd.to_datetime(df_a['日付'])
 df_a = df_a.drop('日付',axis=1)
@@ -108,13 +108,13 @@ df_a['日付'] = df_d
 
 fig3, ax1 = plt.subplots(figsize=(12,8))
 
-ax1.plot(df_a['日付'].tail(days),df_a['重症者累計'].tail(days),label='重症者累計',color='green')
+ax1.plot(df_a['日付'].tail(days),df_a['重症者数'].tail(days),label='重症者数',color='green')
 
-title = "国内重傷者累計推移 {}".format(update)
+title = "国内重傷者数推移 {}".format(update)
 ax1.set_title(title)
 
 ax1.set_xlabel('日付')
-ax1.set_ylabel("重傷者累計（人）")
+ax1.set_ylabel("重傷者（人）")
 
 hd1, lb1 = ax1.get_legend_handles_labels()
 ax1.legend()
@@ -142,7 +142,7 @@ st.pyplot(fig3)
 ### COVID-19感染者関連データ
 """
 
-st.dataframe(df_show[['日付','感染者数','検査数','重症者累計','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
+st.dataframe(df_show[['日付','感染者数','検査数','重症者数','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
 
 st.write(
     'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
