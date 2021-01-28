@@ -136,7 +136,7 @@ if datetime(2021,1,8) > min(df_a['日付'].tail(days)):
 if datetime(2021,1,22) > min(df_a['日付'].tail(days)):
     plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
 
-title = "国内重傷者数推移 {}".format(update)
+title = "国内重傷者数 {}".format(update)
 ax1.set_title(title)
 
 ax1.set_xlabel('日付')
@@ -158,7 +158,7 @@ plt.grid(True)
 st.pyplot(fig)
 
 """
-### 国内重症者累計推移
+### 国内重症者数
 """
 
 st.pyplot(fig3)
