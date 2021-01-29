@@ -378,7 +378,65 @@ st.pyplot(fig2)
 
 st.pyplot(fig1)
 
+# ここから東京都
 
+url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+
+try:
+    r = requests.get(url)
+    summary_json = json.loads(r.text)
+except requests.exceptions.RequestException as err:
+    print(err)
+
+colist = ['日付','感染率']
+
+df_d = pd.DataFrame([row['diagnosed_date']] for row in summary_json['data'])
+df_r = pd.DataFrame([row['weekly_gain_ratio'],row['count']] for row in summary_json['data'])
+
+df_d = pd.to_datetime(df_d[0])
+df_r = df_r.fillna(0).astype(float)
+
+df_r['日付'] = df_d
+
+df = df_r.rename(columns={0:'感染率',1:'感染者数'}).copy()
+
+df = df.tail(350)
+
+figt = plt.figure(figsize=(12,6))
+ax = figt.add_subplot(1,1,1)
+# ax1 = fig.add_subplot(2,2,2)
+ax1 = ax.twinx()
+ax.bar(df['日付'],df['感染者数'],color='lightgray')
+ax1.plot(df['日付'],df['感染率'])
+ax1.hlines(y=1,xmin=min(df['日付']),xmax=max(df['日付']),color='red')
+
+# import datetime as dt
+# kd = dt.datetime(2021,1,8)
+if min(df['日付']) < dt.datetime(2020,4,7):
+    plt.axvline(x=dt.datetime(2020,4,7), color='red', ls='--')
+if min(df['日付']) < dt.datetime(2020,4,21):
+    plt.axvline(x=dt.datetime(2020,4,21), color='green', ls='--')
+if min(df['日付']) < dt.datetime(2020,7,22):
+    plt.axvline(x=dt.datetime(2020,7,22), color='gray', ls='--')
+if min(df['日付']) < dt.datetime(2020,10,1):
+    plt.axvline(x=dt.datetime(2020,10,1), color='gray', ls='--')
+if min(df['日付']) < dt.datetime(2021,1,8):
+    plt.axvline(x=dt.datetime(2021,1,8), color='red', ls='--')
+if min(df['日付']) < dt.datetime(2021,1,22):
+    plt.axvline(x=dt.datetime(2021,1,22), color='green', ls='--')
+
+plt.grid(True)
+title = "東京都感染者比率"
+ax.set_title(title)
+
+ax.set_xlabel('日付')
+ax1.set_ylabel("感染者比率")
+ax.set＿ylabel('感染者（人）')
+
+"""
+### 東京都感染者比率
+"""
+st.pyplot(figt)
 
 # st.write(
 #     'ソース: https://raw.githubusercontent.com/tonytani37/heroku_covid19/master/st_covid19.py'
