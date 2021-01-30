@@ -380,6 +380,6 @@ st.pyplot(fig1)
 
 
 
-# st.write(
-#     'ソース: https://raw.githubusercontent.com/tonytani37/heroku_covid19/master/st_covid19.py'
-#     )
+st.write(
+    'data: https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+    )
