@@ -287,9 +287,40 @@ def main():
         
     """
     # COVID-19 全国感染者情報
-    ### このサイトはStreamlitで作成したものをHerokuで公開しています
-    #### matplotlib
     """
+    # """
+    # ### 国内感染者数（移動平均）
+    # """
+
+    # st.pyplot(fig)
+
+    # """
+    # ### 国内重症者数
+    # """
+
+    # st.pyplot(fig3)
+
+    # """
+    # ### COVID-19感染者関連データ
+    # """
+
+    # st.dataframe(df_show[['日付','感染者数','検査数','重症者数','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
+
+    # st.write(
+    #     'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    #     )
+
+    st.title('都道府県別感染者数(移動平均)')
+    if len(df) > 0:
+        st.line_chart(df_xx1,use_container_width=True)
+    else:
+        st.write('対象の都道府県を選択してください')
+
+    st.title('都道府県別死亡者数(移動平均)')
+    if len(df) > 0:
+        st.line_chart(df_xx2,use_container_width=True)
+    else:
+        st.write('対象の都道府県を選択してください')
 
     """
     ### 国内感染者数（移動平均）
@@ -312,19 +343,6 @@ def main():
     st.write(
         'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
         )
-
-    st.title('都道府県別感染者数(移動平均)')
-    if len(df) > 0:
-        st.line_chart(df_xx1,use_container_width=True)
-    else:
-        st.write('対象の都道府県を選択してください')
-
-    st.title('都道府県別死亡者数(移動平均)')
-    if len(df) > 0:
-        st.line_chart(df_xx2,use_container_width=True)
-    else:
-        st.write('対象の都道府県を選択してください')
-
     """
     ### 東京都感染者比率
     """
