@@ -553,7 +553,7 @@ selected_erea = sorted(selected_erea)
 df_xx = pd.DataFrame(dfl,columns=selected_erea)
 df_xx = df_xx.set_index(df_h)
 
-df_1 = df_xx
+df_xx1 = df_xx
 
 # st.title('都道府県別感染者数(移動平均)')
 # if len(df) > 0:
@@ -586,7 +586,7 @@ selected_erea = sorted(selected_erea)
 df_xx = pd.DataFrame(dfl,columns=selected_erea)
 df_xx = df_xx.set_index(df_h)
 
-df_2 = df_xx
+df_xx2 = df_xx
     
 
 """
@@ -619,13 +619,13 @@ st.write(
 
 st.title('都道府県別感染者数(移動平均)')
 if len(df) > 0:
-    st.line_chart(df_1,use_container_width=True)
+    st.line_chart(df_xx1,use_container_width=True)
 else:
     st.write('対象の都道府県を選択してください')
 
 st.title('都道府県別死亡者数(移動平均)')
 if len(df) > 0:
-    st.line_chart(df_2,use_container_width=True)
+    st.line_chart(df_xx2,use_container_width=True)
 else:
     st.write('対象の都道府県を選択してください')
 
