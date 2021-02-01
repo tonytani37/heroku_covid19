@@ -461,15 +461,19 @@ else:
     st.write('対象の都道府県を選択してください')
 
 # ここから東京都
+@st.cache(allow_output_mutation=True, suppress_st_warning=True)
+def tokyo_data():
+    url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
-url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
-
-try:
-    r = requests.get(url)
-    summary_json = json.loads(r.text)
-except requests.exceptions.RequestException as err:
-    print(err)
-
+    try:
+        r = requests.get(url)
+        summary_json = json.loads(r.text)
+        return summary_json
+    except requests.exceptions.RequestException as err:
+        print(err)
+        
+summary_json = tokyo_data()
+        
 colist = ['日付','感染率']
 
 df_d = pd.DataFrame([row['diagnosed_date']] for row in summary_json['data'])
