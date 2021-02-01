@@ -211,12 +211,12 @@ def data_set(summary_json):
     ax1.set_ylabel("感染者比率")
     ax.set＿ylabel('感染者（人）')
     
-    return fig,fig3,figt,df_show
+    return fig,fig3,figt,df_show,update
 
 def main():
     days = 300 #グラフ化する日数指定
     summary_json = data_load()
-    fig,fig3,figt,df_show = data_set(summary_json)
+    fig,fig3,figt,df_show,update = data_set(summary_json)
 
     # ### 都道府県別感染者数（移動平均）
 
@@ -285,9 +285,13 @@ def main():
 
     df_xx2 = df_xx
         
-    """
-    # COVID-19 全国感染者情報
-    """
+    # """
+    # # COVID-19 全国感染者情報
+    # """
+
+    st.title('COVID-19 全国感染者情報')
+    st.subheader(update)
+    
     # """
     # ### 国内感染者数（移動平均）
     # """
