@@ -15,10 +15,11 @@ def data_load():
     try:
         r = requests.get(url)
         summary_json = json.loads(r.text)
+        return summary_json
     except requests.exceptions.RequestException as err:
         print(err)
         
-data_load()
+summary_json = data_load()
 # json_open = open('file\summary.json', 'r')
 # summary_json = json.load(json_open)
 
