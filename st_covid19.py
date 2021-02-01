@@ -36,7 +36,7 @@ def line_set(df):
     if datetime(2021,1,22) > min(df['日付'].tail(days)):
         plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
         
-summary_json = data_load()
+# summary_json = data_load()
 def data_set(summary_json):
     collist = [
             'date',
@@ -97,7 +97,7 @@ def data_set(summary_json):
     df_a['日付'] = df_d
     # df_df = df_d.iloc[0]
 
-    days = 300 #グラフ化する日数指定
+#     days = 300 #グラフ化する日数指定
 
     fig, ax1 = plt.subplots(figsize=(12,8))
     ax2 = ax1.twinx()
@@ -508,7 +508,8 @@ def data_set(summary_json):
     ax.set＿ylabel('感染者（人）')
     
     return fig,fig2,figt,df_show
-    
+
+days = 300 #グラフ化する日数指定
 summary_json = data_load()
 fig,fig2,figt,df_show = data_set(summary_json)
 
