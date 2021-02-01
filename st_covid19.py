@@ -21,7 +21,7 @@ def data_load():
     # json_open = open('file\summary.json', 'r')
     # summary_json = json.load(json_open
 
-        
+    
 def line_set(df):
     if datetime(2020,4,7) > min(df['日付'].tail(days)):
         plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
@@ -37,6 +37,7 @@ def line_set(df):
         plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
         
 # summary_json = data_load()
+@st.cache(allow_output_mutation=True, suppress_st_warning=True)    
 def data_set(summary_json):
     collist = [
             'date',
@@ -460,7 +461,6 @@ def data_set(summary_json):
     #     st.write('対象の都道府県を選択してください')
 
     # ここから東京都
-    @st.cache(allow_output_mutation=True, suppress_st_warning=True)
     def tokyo_data():
         url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
@@ -507,11 +507,11 @@ def data_set(summary_json):
     ax1.set_ylabel("感染者比率")
     ax.set＿ylabel('感染者（人）')
     
-    return fig,fig2,figt,df_show
+    return fig,fig3,figt,df_show
 
 days = 300 #グラフ化する日数指定
 summary_json = data_load()
-fig,fig2,figt,df_show = data_set(summary_json)
+fig,fig3,figt,df_show = data_set(summary_json)
 
 # ### 都道府県別感染者数（移動平均）
 
