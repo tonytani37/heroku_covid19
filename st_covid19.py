@@ -408,7 +408,7 @@ df_l.insert(0,'都道府県',pd.DataFrame(data_n))
 df_l.insert(1,'合計',pd.DataFrame(df_s))
 
 erea_list = list(df_l['都道府県'].unique())
-selected_erea = st.multiselect('グラフに表示する都道府県を選択', erea_list, default=erea_list[:7])
+selected_erea = st.sidebarmultiselect('グラフに表示する都道府県を選択', erea_list, default=erea_list[:7])
 df = df_l[(df_l['都道府県'].isin(selected_erea))]
 
 df_1 = df.T
