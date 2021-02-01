@@ -18,172 +18,184 @@ def data_load():
         return summary_json
     except requests.exceptions.RequestException as err:
         print(err)
+
+def line_set(df):
+    if datetime(2020,4,7) > min(df['日付'].tail(days)):
+        plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
+    if datetime(2020,4,21) > min(df['日付'].tail(days)):
+        plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
+    if datetime(2020,10,1) > min(df['日付'].tail(days)):
+        plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
+    if datetime(2020,7,22) > min(df['日付'].tail(days)):
+        plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
+    if datetime(2021,1,8) > min(df['日付'].tail(days)):
+        plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
+    if datetime(2021,1,22) > min(df['日付'].tail(days)):
+        plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
         
 summary_json = data_load()
 # json_open = open('file\summary.json', 'r')
 # summary_json = json.load(json_open)
 
-@st.cache(allow_output_mutation=True, suppress_st_warning=True)
-def graph_01(summary_json):
-    collist = [
-            'date',
-            "confirmed",
-            "recoveredCumulative",
-            "deceasedCumulative",
-            "criticalCumulative",
-            "testedCumulative",
-            "confirmedCumulative",
-            "confirmedAvg3d",
-            "confirmedCumulativeAvg3d",
-            "confirmedAvg7d",
-            "confirmedCumulativeAvg7d"
+collist = [
+        'date',
+        "confirmed",
+        "recoveredCumulative",
+        "deceasedCumulative",
+        "criticalCumulative",
+        "testedCumulative",
+        "confirmedCumulative",
+        "confirmedAvg3d",
+        "confirmedCumulativeAvg3d",
+        "confirmedAvg7d",
+        "confirmedCumulativeAvg7d"
+        ]
+
+datalist = [
+            [row['date'],
+             row['confirmed'],
+             row['recoveredCumulative'],
+             row['deceasedCumulative'],
+             row['criticalCumulative'],
+             row['testedCumulative'],
+             row['confirmedCumulative'],
+             row['confirmedAvg3d'],
+             row['confirmedCumulativeAvg3d'],
+             row['confirmedAvg7d'],
+             row['confirmedCumulativeAvg7d']
+             ] 
+            for row in summary_json['daily']
             ]
 
-    datalist = [
-                [row['date'],
-                 row['confirmed'],
-                 row['recoveredCumulative'],
-                 row['deceasedCumulative'],
-                 row['criticalCumulative'],
-                 row['testedCumulative'],
-                 row['confirmedCumulative'],
-                 row['confirmedAvg3d'],
-                 row['confirmedCumulativeAvg3d'],
-                 row['confirmedAvg7d'],
-                 row['confirmedCumulativeAvg7d']
-                 ] 
-                for row in summary_json['daily']
-                ]
+df = pd.DataFrame(datalist,columns=collist)
 
-    df = pd.DataFrame(datalist,columns=collist)
+update = summary_json['updated'][:10]
 
-    update = summary_json['updated'][:10]
+df = df.drop(0)
 
-    df = df.drop(0)
+df_a = df[['date','confirmed','confirmedAvg7d',"criticalCumulative"]].copy() #dataframeはcopyしないとワーニングが出る
+df_ｃ = df['confirmedAvg7d'].copy() #dataframeはcopyしないとワーニングが出る
 
-    df_a = df[['date','confirmed','confirmedAvg7d',"criticalCumulative"]].copy() #dataframeはcopyしないとワーニングが出る
-    df_ｃ = df['confirmedAvg7d'].copy() #dataframeはcopyしないとワーニングが出る
+df_t = df['testedCumulative'].diff()
 
-    df_t = df['testedCumulative'].diff()
+df_ta = list(df_t.rolling(7).mean())
+df_a['検査数'] = df_t
+df_a['検査数移動平均'] = df_ta
 
-    df_ta = list(df_t.rolling(7).mean())
-    df_a['検査数'] = df_t
-    df_a['検査数移動平均'] = df_ta
+df_a = df_a.rename(
+    # columns={'confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
+    columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者数'}
+    )
 
-    df_a = df_a.rename(
-        # columns={'confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
-        columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者数'}
-        )
+df_bd = df_a['日付'].copy()
+df_d = pd.to_datetime(df_a['日付']).copy()
+df_a = df_a.drop('日付',axis=1)
+df_a = df_a.fillna(0).astype(int)
+df_show = df_a.copy()
+df_show['日付'] = df_bd
+df_a['日付'] = df_d
+# df_df = df_d.iloc[0]
 
-    df_bd = df_a['日付'].copy()
-    df_d = pd.to_datetime(df_a['日付']).copy()
-    df_a = df_a.drop('日付',axis=1)
-    df_a = df_a.fillna(0).astype(int)
-    df_show = df_a.copy()
-    df_show['日付'] = df_bd
-    df_a['日付'] = df_d
-    # df_df = df_d.iloc[0]
+days = 300 #グラフ化する日数指定
 
-    days = 300 #グラフ化する日数指定
+fig, ax1 = plt.subplots(figsize=(12,8))
+ax2 = ax1.twinx()
+ax1.bar(df_a['日付'].tail(days),df_a['感染者数'].tail(days),label='日次感染者数',color='lightgray')
+ax1.plot(df_a['日付'].tail(days),df_a['感染者数移動平均'].tail(days),label='感染者数移動平均',color='red',linewidth=2)
+ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),label='検査数移動平均',color='green',linewidth=2)
 
-    fig, ax1 = plt.subplots(figsize=(12,8))
-    ax2 = ax1.twinx()
-    ax1.bar(df_a['日付'].tail(days),df_a['感染者数'].tail(days),label='日次感染者数',color='lightgray')
-    ax1.plot(df_a['日付'].tail(days),df_a['感染者数移動平均'].tail(days),label='感染者数移動平均',color='red',linewidth=2)
-    ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),label='検査数移動平均',color='green',linewidth=2)
+line_set(df_a)
+# if datetime(2020,4,7) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
+# if datetime(2020,4,21) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
+# if datetime(2020,10,1) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
+# if datetime(2020,7,22) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
+# if datetime(2021,1,8) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
+# if datetime(2021,1,22) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
 
-    if datetime(2020,4,7) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
-    if datetime(2020,4,21) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
-    if datetime(2020,10,1) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
-    if datetime(2020,7,22) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
-    if datetime(2021,1,8) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
-    if datetime(2021,1,22) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
+title = "国内感染者数推移（日毎 移動平均)  {}".format(update)
+ax1.set_title(title)
 
-    title = "国内感染者数推移（日毎 移動平均)  {}".format(update)
-    ax1.set_title(title)
+ax1.set_xlabel('日付')
+ax1.set_ylabel("7日平均感染者数（人）")
+ax2.set_ylabel("7日平均検査者数（件）")
 
-    ax1.set_xlabel('日付')
-    ax1.set_ylabel("7日平均感染者数（人）")
-    ax2.set_ylabel("7日平均検査者数（件）")
+hd1, lb1 = ax1.get_legend_handles_labels()
+hd2, lb2 = ax2.get_legend_handles_labels()
+# 凡例をまとめて出力する
+ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
+plt.grid(True)
 
-    hd1, lb1 = ax1.get_legend_handles_labels()
-    hd2, lb2 = ax2.get_legend_handles_labels()
-    # 凡例をまとめて出力する
-    ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
-    plt.grid(True)
+# df_cr = df[['date',"criticalCumulative"]]
 
-    # df_cr = df[['date',"criticalCumulative"]]
+# df_b = df_cr.rename(
+#     columns={'date':'日付',"criticalCumulative":'重症者数'})
 
-    # df_b = df_cr.rename(
-    #     columns={'date':'日付',"criticalCumulative":'重症者数'})
+df_d = pd.to_datetime(df_a['日付'])
+df_a = df_a.drop('日付',axis=1)
+df_a = df_a.fillna(0).astype(int)
+df_a['日付'] = df_d
 
-    df_d = pd.to_datetime(df_a['日付'])
-    df_a = df_a.drop('日付',axis=1)
-    df_a = df_a.fillna(0).astype(int)
-    df_a['日付'] = df_d
+fig3, ax1 = plt.subplots(figsize=(12,8))
 
-    fig3, ax1 = plt.subplots(figsize=(12,8))
+ax1.plot(df_a['日付'].tail(days),df_a['重症者数'].tail(days),label='重症者数',color='green')
 
-    ax1.plot(df_a['日付'].tail(days),df_a['重症者数'].tail(days),label='重症者数',color='green')
+line_set(df_a)
+# if datetime(2020,4,7) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
+# if datetime(2020,4,21) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
+# if datetime(2020,10,1) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
+# if datetime(2020,7,22) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
+# if datetime(2021,1,8) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
+# if datetime(2021,1,22) > min(df_a['日付'].tail(days)):
+#     plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
 
-    if datetime(2020,4,7) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
-    if datetime(2020,4,21) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
-    if datetime(2020,10,1) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
-    if datetime(2020,7,22) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
-    if datetime(2021,1,8) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
-    if datetime(2021,1,22) > min(df_a['日付'].tail(days)):
-        plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
+title = "国内重傷者数 {}".format(update)
+ax1.set_title(title)
 
-    title = "国内重傷者数 {}".format(update)
-    ax1.set_title(title)
+ax1.set_xlabel('日付')
+ax1.set_ylabel("重傷者（人）")
 
-    ax1.set_xlabel('日付')
-    ax1.set_ylabel("重傷者（人）")
+ax1.legend()
+plt.grid(True)
 
-    ax1.legend()
-    plt.grid(True)
+"""
+# COVID-19 全国感染者情報
+### このサイトはStreamlitで作成したものをHerokuで公開しています
+#### matplotlib
+"""
 
-    """
-    # COVID-19 全国感染者情報
-    ### このサイトはStreamlitで作成したものをHerokuで公開しています
-    #### matplotlib
-    """
+"""
+### 国内感染者数（移動平均）
+"""
 
-    """
-    ### 国内感染者数（移動平均）
-    """
+st.pyplot(fig)
 
-    st.pyplot(fig)
+"""
+### 国内重症者数
+"""
 
-    """
-    ### 国内重症者数
-    """
+st.pyplot(fig3)
 
-    st.pyplot(fig3)
+"""
+### COVID-19感染者関連データ
+"""
 
-    """
-    ### COVID-19感染者関連データ
-    """
+st.dataframe(df_show[['日付','感染者数','検査数','重症者数','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
 
-    st.dataframe(df_show[['日付','感染者数','検査数','重症者数','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
-
-    st.write(
-        'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
-        )
-    
-graph_01(summary_json)
-    
+st.write(
+    'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    )
+        
     
 data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
 data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
@@ -503,18 +515,19 @@ ax1.hlines(y=1,xmin=min(df['日付']),xmax=max(df['日付']),color='red')
 
 # import datetime as dt
 # kd = dt.datetime(2021,1,8)
-if min(df['日付']) < dt.datetime(2020,4,7):
-    plt.axvline(x=dt.datetime(2020,4,7), color='red', ls='--')
-if min(df['日付']) < dt.datetime(2020,4,21):
-    plt.axvline(x=dt.datetime(2020,4,21), color='green', ls='--')
-if min(df['日付']) < dt.datetime(2020,7,22):
-    plt.axvline(x=dt.datetime(2020,7,22), color='gray', ls='--')
-if min(df['日付']) < dt.datetime(2020,10,1):
-    plt.axvline(x=dt.datetime(2020,10,1), color='gray', ls='--')
-if min(df['日付']) < dt.datetime(2021,1,8):
-    plt.axvline(x=dt.datetime(2021,1,8), color='red', ls='--')
-if min(df['日付']) < dt.datetime(2021,1,22):
-    plt.axvline(x=dt.datetime(2021,1,22), color='green', ls='--')
+line_set(df)
+# if min(df['日付']) < dt.datetime(2020,4,7):
+#     plt.axvline(x=dt.datetime(2020,4,7), color='red', ls='--')
+# if min(df['日付']) < dt.datetime(2020,4,21):
+#     plt.axvline(x=dt.datetime(2020,4,21), color='green', ls='--')
+# if min(df['日付']) < dt.datetime(2020,7,22):
+#     plt.axvline(x=dt.datetime(2020,7,22), color='gray', ls='--')
+# if min(df['日付']) < dt.datetime(2020,10,1):
+#     plt.axvline(x=dt.datetime(2020,10,1), color='gray', ls='--')
+# if min(df['日付']) < dt.datetime(2021,1,8):
+#     plt.axvline(x=dt.datetime(2021,1,8), color='red', ls='--')
+# if min(df['日付']) < dt.datetime(2021,1,22):
+#     plt.axvline(x=dt.datetime(2021,1,22), color='green', ls='--')
 
 plt.grid(True)
 title = "東京都感染者比率"
