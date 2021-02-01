@@ -19,7 +19,18 @@ def data_load():
     except requests.exceptions.RequestException as err:
         print(err)
     # json_open = open('file\summary.json', 'r')
-    # summary_json = json.load(json_open
+    # summary_json = json.load(json_open)
+    
+@st.cache(allow_output_mutation=True, suppress_st_warning=True)  
+def tokyo_data():
+    url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+
+    try:
+        r = requests.get(url)
+        summary_json = json.loads(r.text)
+        return summary_json
+    except requests.exceptions.RequestException as err:
+        print(err)
 
     
 def line_set(df):
@@ -35,8 +46,7 @@ def line_set(df):
         plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
     if datetime(2021,1,22) > min(df['日付'].tail(days)):
         plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
-        
-# summary_json = data_load()
+
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)    
 def data_set(summary_json):
     collist = [
@@ -461,15 +471,15 @@ def data_set(summary_json):
     #     st.write('対象の都道府県を選択してください')
 
     # ここから東京都
-    def tokyo_data():
-        url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+#     def tokyo_data():
+#         url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
-        try:
-            r = requests.get(url)
-            summary_json = json.loads(r.text)
-            return summary_json
-        except requests.exceptions.RequestException as err:
-            print(err)
+#         try:
+#             r = requests.get(url)
+#             summary_json = json.loads(r.text)
+#             return summary_json
+#         except requests.exceptions.RequestException as err:
+#             print(err)
 
     summary_json = tokyo_data()
 
