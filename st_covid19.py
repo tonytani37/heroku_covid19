@@ -8,14 +8,17 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 from datetime import datetime, timedelta, timezone
 
-url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+@st.cache(allow_output_mutation=True, suppress_st_warning=True)
+def data_load():
+    url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
-try:
-    r = requests.get(url)
-    summary_json = json.loads(r.text)
-except requests.exceptions.RequestException as err:
-    print(err)
-
+    try:
+        r = requests.get(url)
+        summary_json = json.loads(r.text)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        
+data_load()
 # json_open = open('file\summary.json', 'r')
 # summary_json = json.load(json_open)
 
