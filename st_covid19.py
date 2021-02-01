@@ -418,7 +418,7 @@ data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死
 
 data_ls = []
 for row in data_l:
-    data_ls.append(row[-300:])
+    data_ls.append(row[-days:])
 
 df_l = pd.DataFrame(data_ls,columns=df_h)
 df_s = []
@@ -449,7 +449,7 @@ else:
 # ### 都道府県別死亡者数（移動平均）
 data_ds = []
 for row in data_d:
-    data_ds.append(row[-300:])
+    data_ds.append(row[-days:])
 
 df_d = pd.DataFrame(data_ds,columns=df_h)
 df_s = []
@@ -503,7 +503,7 @@ df_r['日付'] = df_d
 
 df = df_r.rename(columns={0:'感染率',1:'感染者数'}).copy()
 
-df = df.tail(350)
+df = df.tail(days)
 
 figt = plt.figure(figsize=(12,6))
 ax = figt.add_subplot(1,1,1)
