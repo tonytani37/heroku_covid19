@@ -259,8 +259,8 @@ def main():
     ## 都道府県別の感染者合計と直近の感染者数をDataFrameにコピーする ##
     # df_total = df_l.iloc[:,-1]
     df_total = pd.DataFrame(data_n,columns={'都道府県'})
-    df_total['感染者計'] =  pd.DataFrame(df_s)
-    df_total['感染者 '] = df_l.iloc[:,-2]
+    df_total['　　感染者計　'] =  pd.DataFrame(df_s)
+    df_total['　　感染者　　'] = df_l.iloc[:,-2]
     #####
 
     erea_list = list(df_l['都道府県'].unique())
@@ -290,8 +290,8 @@ def main():
     df_d.insert(0,'都道府県',pd.DataFrame(data_n))
     df_d.insert(1,'合計',pd.DataFrame(df_s))
 
-    df_total['死亡者計'] =  pd.DataFrame(df_s)
-    df_total['死亡者 '] = df_d.iloc[:,-2]
+    df_total['　　死亡者計　'] =  pd.DataFrame(df_s)
+    df_total['　　死亡者　　'] = df_d.iloc[:,-2]
 
     df = df_d[(df_d['都道府県'].isin(selected_erea))]
 
@@ -325,7 +325,7 @@ def main():
         st.write('対象の都道府県を選択してください')
 
     """
-    ### 都道府県別感染者・死亡者関連データ（前日確定データ）
+    ### 都道府県別感染者・死亡者関連データ
     """
 
     st.dataframe(df_total.style.highlight_max(axis=0))
