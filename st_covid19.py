@@ -222,143 +222,148 @@ def data_set(summary_json):
 
 def main():
     days = 300 #グラフ化する日数指定
-    
     summary_json = data_load()
     fig,fig3,figt,df_show,update = data_set(summary_json)
+
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader('最終更新日 '+update)
-    # ### 都道府県別感染者数（移動平均）
 
-    datalist = [
-                [row['date']
-                ] 
-                for row in summary_json['daily']
-                ]
-
-    df_h = pd.DataFrame(datalist,columns=['日付'])
-    df_h = pd.to_datetime(df_h['日付'])
-    df_h = df_h[-300:]
-
-    data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
-#     data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
-    data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
-    data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
-
-    data_ls = []
-    for row in data_l: # daysで指定された日数分だけ抜き出し
-        data_ls.append(row[-days:])
-    df_l = pd.DataFrame(data_ls,columns=df_h)
-
-    df_s = []
-    for row in data_l: #全部合計
-        df_s.append(sum(row))
-
-    df_l.insert(0,'都道府県',pd.DataFrame(data_n))
-    df_l.insert(1,'合計',pd.DataFrame(df_s))
-
-    ## 都道府県別の感染者合計と直近の感染者数をDataFrameにコピーする ##
-    # df_total = df_l.iloc[:,-1]
-    df_total = pd.DataFrame(data_n,columns={'都道府県'})
-    df_total['　　感染者計　'] =  pd.DataFrame(df_s)
-    df_total['　　感染者　　'] = df_l.iloc[:,-2]
-    #####
-
-    erea_list = list(df_l['都道府県'].unique())
-    selected_erea = st.sidebar.multiselect('グラフに表示する都道府県を選択', erea_list, default=erea_list[:7])
-    df = df_l[(df_l['都道府県'].isin(selected_erea))]
-
-    df_1 = df.T
-    df_1 = df_1.drop(['都道府県','合計'],axis=0)
-    df_1 = df_1.rolling(7).mean()
-    dfl = df_1.values.tolist()
-    selected_erea = sorted(selected_erea)
-    df_xx = pd.DataFrame(dfl,columns=selected_erea)
-    df_xx = df_xx.set_index(df_h)
-
-    df_xx1 = df_xx
-
-    # ### 都道府県別死亡者数（移動平均）
-    data_ds = []
-    for row in data_d:
-        data_ds.append(row[-days:])
-
-    df_d = pd.DataFrame(data_ds,columns=df_h)
-    df_s = []
-    for row in data_d:
-        df_s.append(sum(row))
-
-    df_d.insert(0,'都道府県',pd.DataFrame(data_n))
-    df_d.insert(1,'合計',pd.DataFrame(df_s))
-
-    df_total['　　死亡者計　'] =  pd.DataFrame(df_s)
-    df_total['　　死亡者　　'] = df_d.iloc[:,-2]
-
-    df = df_d[(df_d['都道府県'].isin(selected_erea))]
-
-    df_1 = df.T
-    df_1 = df_1.drop(['都道府県','合計'],axis=0)
-    df_1 = df_1.rolling(7).mean()
-    dfl = df_1.values.tolist()
-    selected_erea = sorted(selected_erea)
-    df_xx = pd.DataFrame(dfl,columns=selected_erea)
-    df_xx = df_xx.set_index(df_h)
-
-    df_xx2 = df_xx
-
-    st.sidebar.write('このサイトでは「日本国内の新型コロナウイルス (COVID-19) 感染状況追跡」(https://covid19japan.com)で作成されたデータを利用してます')
+    option = st.sidebar.selectbox(
+        '選択してください',
+        ('全国感染者情報', '都道府県感染者情報', '東京都感染率')
+        )
     
+    st.sidebar.write('このサイトでは「日本国内の新型コロナウイルス (COVID-19) 感染状況追跡」(https://covid19japan.com)で作成されたデータを利用してます')
     st.sidebar.write('当日データは順次更新されますので、確定値はない場合があります')
     
-    """
-    ### 都道府県別感染者数(移動平均)
-    """
-    if len(df) > 0:
-        st.line_chart(df_xx1,use_container_width=True)
-    else:
-        st.write('対象の都道府県を選択してください')
-    """
-    ### 都道府県別死亡者数(移動平均)
-    """
-    if len(df) > 0:
-        st.line_chart(df_xx2,use_container_width=True)
-    else:
-        st.write('対象の都道府県を選択してください')
+    if option == '全国感染者情報':
+        """
+        ## 全国感染者情報
+        ### 国内感染者数（移動平均）
+        """
+        st.pyplot(fig)
+        """
+        ### 国内重症者数
+        """
+        st.pyplot(fig3)
+        """
+        ### COVID-19感染者関連データ
+        """
+        st.dataframe(df_show[['日付','感染者数','検査数','重症者数','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
+        st.write(
+            'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+            )
+    elif option == '都道府県感染者情報':
+    # ### 都道府県別感染者数（移動平均）
+        datalist = [
+                    [row['date']
+                    ] 
+                    for row in summary_json['daily']
+                    ]
 
-    """
-    ### 都道府県別感染者・死亡者関連データ
-    """
+        df_h = pd.DataFrame(datalist,columns=['日付'])
+        df_h = pd.to_datetime(df_h['日付'])
+        df_h = df_h[-300:]
 
-    st.dataframe(df_total.style.highlight_max(axis=0))
+        data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
+    #     data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
+        data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
+        data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
 
-    """
-    ### 国内感染者数（移動平均）
-    """
+        data_ls = []
+        for row in data_l: # daysで指定された日数分だけ抜き出し
+            data_ls.append(row[-days:])
+        df_l = pd.DataFrame(data_ls,columns=df_h)
 
-    st.pyplot(fig)
+        df_s = []
+        for row in data_l: #全部合計
+            df_s.append(sum(row))
 
-    """
-    ### 国内重症者数
-    """
+        df_l.insert(0,'都道府県',pd.DataFrame(data_n))
+        df_l.insert(1,'合計',pd.DataFrame(df_s))
 
-    st.pyplot(fig3)
+        ## 都道府県別の感染者合計と直近の感染者数をDataFrameにコピーする ##
+        # df_total = df_l.iloc[:,-1]
+        df_total = pd.DataFrame(data_n,columns={'都道府県'})
+        df_total['　　感染者計　'] =  pd.DataFrame(df_s)
+        df_total['　　感染者　　'] = df_l.iloc[:,-2]
+        #####
+        """
+        ## 都道府県感染者情報
+        """
 
-    """
-    ### COVID-19感染者関連データ
-    """
+        erea_list = list(df_l['都道府県'].unique())
+        selected_erea = st.multiselect('都道府県を選択してください', erea_list, default=erea_list[:5])
+        df = df_l[(df_l['都道府県'].isin(selected_erea))]
 
-    st.dataframe(df_show[['日付','感染者数','検査数','重症者数','感染者数移動平均','検査数移動平均']].style.highlight_max(axis=0),height=400)
+        df_1 = df.T
+        df_1 = df_1.drop(['都道府県','合計'],axis=0)
+        df_1 = df_1.rolling(7).mean()
+        dfl = df_1.values.tolist()
+        selected_erea = sorted(selected_erea)
+        df_xx = pd.DataFrame(dfl,columns=selected_erea)
+        df_xx = df_xx.set_index(df_h)
 
-    st.write(
-        'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
-        )
-    """
-    ### 東京都感染者比率
-    """
-    st.pyplot(figt)
+        df_xx1 = df_xx
 
-    st.write(
-        'data: https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
-        )
+        # ### 都道府県別死亡者数（移動平均）
+        data_ds = []
+        for row in data_d:
+            data_ds.append(row[-days:])
+
+        df_d = pd.DataFrame(data_ds,columns=df_h)
+        df_s = []
+        for row in data_d:
+            df_s.append(sum(row))
+
+        df_d.insert(0,'都道府県',pd.DataFrame(data_n))
+        df_d.insert(1,'合計',pd.DataFrame(df_s))
+
+        df_total['　　死亡者計　'] =  pd.DataFrame(df_s)
+        df_total['　　死亡者　　'] = df_d.iloc[:,-2]
+
+        df = df_d[(df_d['都道府県'].isin(selected_erea))]
+
+        df_1 = df.T
+        df_1 = df_1.drop(['都道府県','合計'],axis=0)
+        df_1 = df_1.rolling(7).mean()
+        dfl = df_1.values.tolist()
+        selected_erea = sorted(selected_erea)
+        df_xx = pd.DataFrame(dfl,columns=selected_erea)
+        df_xx = df_xx.set_index(df_h)
+
+        df_xx2 = df_xx
+
+        """
+        ### 都道府県別感染者数(移動平均)
+        """
+        if len(df) > 0:
+            st.line_chart(df_xx1,use_container_width=True)
+        else:
+            st.write('対象の都道府県を選択してください')
+        """
+        ### 都道府県別死亡者数(移動平均)
+        """
+        if len(df) > 0:
+            st.line_chart(df_xx2,use_container_width=True)
+        else:
+            st.write('対象の都道府県を選択してください')
+
+        """
+        ### 都道府県別感染者・死亡者関連データ
+        """
+        st.dataframe(df_total.style.highlight_max(axis=0))
+    elif option == '東京都感染率':
+        """
+        ## 東京都感染率
+        ### 東京都感染者比率
+        """
+        st.pyplot(figt)
+
+        st.write(
+            'data: https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+            )
+
 
 if __name__ == "__main__":
     main()
