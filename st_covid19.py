@@ -225,7 +225,8 @@ def main():
     
     summary_json = data_load()
     fig,fig3,figt,df_show,update = data_set(summary_json)
-
+    st.sidebar.title('COVID-19 全国感染者情報')
+    st.sidebar.subheader('最新データ '+update)
     # ### 都道府県別感染者数（移動平均）
 
     datalist = [
@@ -304,8 +305,7 @@ def main():
 
     df_xx2 = df_xx
 
-    st.title('COVID-19 全国感染者情報')
-    st.subheader(update)
+    st.sidebar.write('このサイトでは「日本国内の新型コロナウイルス (COVID-19) 感染状況追跡」(https://covid19japan.com)で作成されたデータを利用してます')
 
     st.title('都道府県別感染者数(移動平均)')
     if len(df) > 0:
