@@ -226,7 +226,7 @@ def main():
     fig,fig3,figt,df_show,update = data_set(summary_json)
 
     st.sidebar.title('COVID-19 全国感染者情報')
-    st.sidebar.subheader('最終更新日 '+update)
+    st.sidebar.subheader(update)
 
     option = st.sidebar.selectbox(
         '選択してください',
