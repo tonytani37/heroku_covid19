@@ -260,7 +260,7 @@ def main():
     # df_total = df_l.iloc[:,-1]
     df_total = pd.DataFrame(data_n,columns={'都道府県'})
     df_total['感染者数'] =  pd.DataFrame(df_s)
-    df_total[update+'感染者 '] = df_l.iloc[:,-2]
+    df_total[update+'感染者 '] = df_l.iloc[:,-1]
     #####
 
     erea_list = list(df_l['都道府県'].unique())
@@ -291,7 +291,7 @@ def main():
     df_d.insert(1,'合計',pd.DataFrame(df_s))
 
     df_total['死亡者数'] =  pd.DataFrame(df_s)
-    df_total[update+'死亡者 '] = df_d.iloc[:,-2]
+    df_total[update+'死亡者 '] = df_d.iloc[:,-1]
 
     df = df_d[(df_d['都道府県'].isin(selected_erea))]
 
