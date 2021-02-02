@@ -162,7 +162,8 @@ def data_set(summary_json):
     ax1.legend()
     plt.grid(True)
 
-    data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
+#     data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
+    data_n = [row['name'] for row in summary_json['prefectures']] #都道府県名
     data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
     data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
 
@@ -237,7 +238,8 @@ def main():
     df_h = pd.to_datetime(df_h['日付'])
     df_h = df_h[-300:]
 
-    data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
+#     data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
+    data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
     data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
     data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
 
