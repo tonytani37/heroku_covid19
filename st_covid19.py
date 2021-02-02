@@ -306,14 +306,17 @@ def main():
     df_xx2 = df_xx
 
     st.sidebar.write('このサイトでは「日本国内の新型コロナウイルス (COVID-19) 感染状況追跡」(https://covid19japan.com)で作成されたデータを利用してます')
-
-    st.title('都道府県別感染者数(移動平均)')
+    
+    """
+    ### 都道府県別感染者数(移動平均)
+    """
     if len(df) > 0:
         st.line_chart(df_xx1,use_container_width=True)
     else:
         st.write('対象の都道府県を選択してください')
-
-    st.title('都道府県別死亡者数(移動平均)')
+    """
+    ### 都道府県別死亡者数(移動平均)
+    """
     if len(df) > 0:
         st.line_chart(df_xx2,use_container_width=True)
     else:
