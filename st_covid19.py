@@ -233,13 +233,55 @@ def data_set(summary_json):
 #     data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
     data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
     data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
+
+    data_ls = []
+    for row in data_l: # daysで指定された日数分だけ抜き出し
+        data_ls.append(row[-days:])
+    df_l = pd.DataFrame(data_ls,columns=df_h)
+
+    df_s = []
+    for row in data_l: #全部合計
+        df_s.append(sum(row))
+
+    df_l.insert(0,'都道府県',pd.DataFrame(data_n))
+    df_l.insert(1,'合計',pd.DataFrame(df_s))
+    # df_l.insert(0,'date',df_h)
+
+    ## 都道府県別の感染者合計と直近の感染者数をDataFrameにコピーする ##
+    # df_total = df_l.iloc[:,-1]
+    df_total = pd.DataFrame(data_n,columns={'都道府県'})
+    df_total['　　感染者計　'] =  pd.DataFrame(df_s)
+    if df_l.iloc[:,-1].sum() == 0:
+        df_total['　　感染者　　'] = df_l.iloc[:,-2]
+    else:
+        df_total['　　感染者　　'] = df_l.iloc[:,-1]
+    #####
+    # ### 都道府県別死亡者数（移動平均）
+    data_ds = []
+    for row in data_d:
+        data_ds.append(row[-days:])
+
+    df_d = pd.DataFrame(data_ds,columns=df_h)
+    df_s = []
+    for row in data_d:
+        df_s.append(sum(row))
+
+    df_d.insert(0,'都道府県',pd.DataFrame(data_n))
+    df_d.insert(1,'合計',pd.DataFrame(df_s))
+
+    df_total['　　死亡者計　'] =  pd.DataFrame(df_s)
+    if df_d.iloc[:,-1].sum() == 0:
+        df_total['　　死亡者　　'] = df_d.iloc[:,-2]
+    else:
+        df_total['　　死亡者　　'] = df_d.iloc[:,-1]
+
     
-    return fig,fig3,figt,df_show,update,data_l,data_d,data_n,df,df_h
+    return fig,fig3,figt,df_show,update,df_l,df_d,df,df_h,df_total
 
 def main():
     days = 300 #グラフ化する日数指定
     summary_json = data_load()
-    fig,fig3,figt,df_show,update,data_l,data_d,data_n,df,df_h = data_set(summary_json)
+    fig,fig3,figt,df_show,update,df_l,df_d,df,df_h,df_total = data_set(summary_json)
 
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader(update)
@@ -270,28 +312,6 @@ def main():
             'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
             )
     elif option == '都道府県感染者情報':
-        data_ls = []
-        for row in data_l: # daysで指定された日数分だけ抜き出し
-            data_ls.append(row[-days:])
-        df_l = pd.DataFrame(data_ls,columns=df_h)
-
-        df_s = []
-        for row in data_l: #全部合計
-            df_s.append(sum(row))
-
-        df_l.insert(0,'都道府県',pd.DataFrame(data_n))
-        df_l.insert(1,'合計',pd.DataFrame(df_s))
-        # df_l.insert(0,'date',df_h)
-
-        ## 都道府県別の感染者合計と直近の感染者数をDataFrameにコピーする ##
-        # df_total = df_l.iloc[:,-1]
-        df_total = pd.DataFrame(data_n,columns={'都道府県'})
-        df_total['　　感染者計　'] =  pd.DataFrame(df_s)
-        if df_l.iloc[:,-1].sum() == 0:
-            df_total['　　感染者　　'] = df_l.iloc[:,-2]
-        else:
-            df_total['　　感染者　　'] = df_l.iloc[:,-1]
-        #####
         """
         ## 都道府県感染者情報
         """
@@ -307,25 +327,6 @@ def main():
         df_xx = df_xx.set_index(df_h)
 
         df_xx1 = df_xx
-
-        # ### 都道府県別死亡者数（移動平均）
-        data_ds = []
-        for row in data_d:
-            data_ds.append(row[-days:])
-
-        df_d = pd.DataFrame(data_ds,columns=df_h)
-        df_s = []
-        for row in data_d:
-            df_s.append(sum(row))
-
-        df_d.insert(0,'都道府県',pd.DataFrame(data_n))
-        df_d.insert(1,'合計',pd.DataFrame(df_s))
-
-        df_total['　　死亡者計　'] =  pd.DataFrame(df_s)
-        if df_d.iloc[:,-1].sum() == 0:
-            df_total['　　死亡者　　'] = df_d.iloc[:,-2]
-        else:
-            df_total['　　死亡者　　'] = df_d.iloc[:,-1]
 
         df = df_d[(df_d['都道府県'].isin(selected_erea))]
 
