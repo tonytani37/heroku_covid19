@@ -10,33 +10,33 @@ from datetime import datetime, timedelta, timezone
 
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)
 def data_load():
-    url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    # url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
         
-#     json_open = open('file\summary.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file\summary.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
     
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)  
 def tokyo_data():
-    url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+    # url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
 
-#     json_open = open('file/tokyo.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file/tokyo.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
 
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)    
 def line_set(df,days):
@@ -182,12 +182,12 @@ def data_set(summary_json):
     df_date = df_date['日付']
     df_n = pd.DataFrame(data_n)
 
-    summary_json = tokyo_data()
+    summary_json_t = tokyo_data()
 
     colist = ['日付','感染率']
 
-    df_d = pd.DataFrame([row['diagnosed_date']] for row in summary_json['data'])
-    df_r = pd.DataFrame([row['weekly_gain_ratio'],row['count']] for row in summary_json['data'])
+    df_d = pd.DataFrame([row['diagnosed_date']] for row in summary_json_t['data'])
+    df_r = pd.DataFrame([row['weekly_gain_ratio'],row['count']] for row in summary_json_t['data'])
 
     df_d = pd.to_datetime(df_d[0])
     df_r = df_r.fillna(0).astype(float)
@@ -217,13 +217,29 @@ def data_set(summary_json):
     ax.set_xlabel('日付')
     ax1.set_ylabel("感染者比率")
     ax.set＿ylabel('感染者（人）')
+
+    # ### 都道府県別感染者数（移動平均）
+    datalist = [
+                [row['date']
+                ] 
+                for row in summary_json['daily']
+                ]
+
+    df_h = pd.DataFrame(datalist,columns=['日付'])
+    df_h = pd.to_datetime(df_h['日付'])
+    df_h = df_h[-300:]
+
+    data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
+#     data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
+    data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
+    data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
     
-    return fig,fig3,figt,df_show,update
+    return fig,fig3,figt,df_show,update,data_l,data_d,data_n,df,df_h
 
 def main():
     days = 300 #グラフ化する日数指定
     summary_json = data_load()
-    fig,fig3,figt,df_show,update = data_set(summary_json)
+    fig,fig3,figt,df_show,update,data_l,data_d,data_n,df,df_h = data_set(summary_json)
 
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader(update)
@@ -254,22 +270,6 @@ def main():
             'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
             )
     elif option == '都道府県感染者情報':
-    # ### 都道府県別感染者数（移動平均）
-        datalist = [
-                    [row['date']
-                    ] 
-                    for row in summary_json['daily']
-                    ]
-
-        df_h = pd.DataFrame(datalist,columns=['日付'])
-        df_h = pd.to_datetime(df_h['日付'])
-        df_h = df_h[-300:]
-
-        data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
-    #     data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
-        data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
-        data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
-
         data_ls = []
         for row in data_l: # daysで指定された日数分だけ抜き出し
             data_ls.append(row[-days:])
@@ -281,6 +281,7 @@ def main():
 
         df_l.insert(0,'都道府県',pd.DataFrame(data_n))
         df_l.insert(1,'合計',pd.DataFrame(df_s))
+        # df_l.insert(0,'date',df_h)
 
         ## 都道府県別の感染者合計と直近の感染者数をDataFrameにコピーする ##
         # df_total = df_l.iloc[:,-1]
@@ -294,16 +295,13 @@ def main():
         """
         ## 都道府県感染者情報
         """
-
         erea_list = list(df_l['都道府県'].unique())
         selected_erea = st.multiselect('都道府県を選択してください', erea_list, default=erea_list[:5])
         df = df_l[(df_l['都道府県'].isin(selected_erea))]
-
         df_1 = df.T
         df_1 = df_1.drop(['都道府県','合計'],axis=0)
         df_1 = df_1.rolling(7).mean()
         dfl = df_1.values.tolist()
-        selected_erea = sorted(selected_erea)
         df_xx = pd.DataFrame(dfl,columns=selected_erea)
         df_xx = df_xx.set_index(df_h)
 
@@ -334,7 +332,6 @@ def main():
         df_1 = df_1.drop(['都道府県','合計'],axis=0)
         df_1 = df_1.rolling(7).mean()
         dfl = df_1.values.tolist()
-        selected_erea = sorted(selected_erea)
         df_xx = pd.DataFrame(dfl,columns=selected_erea)
         df_xx = df_xx.set_index(df_h)
 
