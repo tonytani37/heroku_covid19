@@ -302,6 +302,7 @@ def main():
         df_1 = df_1.drop(['都道府県','合計'],axis=0)
         df_1 = df_1.rolling(7).mean()
         dfl = df_1.values.tolist()
+        selected_erea = sorted(selected_erea)
         df_xx = pd.DataFrame(dfl,columns=selected_erea)
         df_xx = df_xx.set_index(df_h)
 
@@ -332,6 +333,7 @@ def main():
         df_1 = df_1.drop(['都道府県','合計'],axis=0)
         df_1 = df_1.rolling(7).mean()
         dfl = df_1.values.tolist()
+        selected_erea = sorted(selected_erea)
         df_xx = pd.DataFrame(dfl,columns=selected_erea)
         df_xx = df_xx.set_index(df_h)
 
