@@ -10,33 +10,33 @@ from datetime import datetime, timedelta, timezone
 
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)
 def data_load():
-    url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    # url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
         
-#     json_open = open('file\summary.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file\summary.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
     
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)  
 def tokyo_data():
-    url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+    # url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
 
-#     json_open = open('file/tokyo.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file/tokyo.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
 
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)    
 def line_set(df,days):
@@ -315,28 +315,58 @@ def main():
         """
         ## 都道府県感染者情報
         """
+        dateList = [row['date'] for row in summary_json['daily']]
+
+        df_date = pd.to_datetime(dateList)
+        dateList_date = [datetime(row.year,row.month,row.day) for row in df_date[-days:]]
+
+        dateFrom = dateList_date[0]
+        dateTo = dateList_date[-1]
+
+        values = st.slider(
+            '表示期間を指定してください',
+                dateFrom, dateTo, (dateFrom, dateTo)
+                )
+        
+        dateF = values[0]
+        dateT = values[1]
+        
+        st.write('表示期間 ',str(dateF.year)+'/'+str(dateF.month)+'/'+str(dateF.day),
+        '<------>',str(dateT.year)+'/'+str(dateT.month)+'/'+str(dateT.day))
+        
         erea_list = list(df_l['都道府県'].unique())
         selected_erea = st.multiselect('都道府県を選択してください', erea_list, default=erea_list[:5])
         df = df_l[(df_l['都道府県'].isin(selected_erea))]
-        df_1 = df.T
-        df_1 = df_1.drop(['都道府県','合計'],axis=0)
-        df_1 = df_1.rolling(7).mean()
-        dfl = df_1.values.tolist()
+
+        df_lt = df.T
+        df_lta = df_lt.drop(['都道府県','合計'],axis=0)
+        df_lta['date'] = dateList_date
+        df_lta = df_lta[(df_lta['date'] >= dateF) & (df_lta['date'] <= dateT)]
+
+        data_index = df_lta['date']
+        
+        df_lta = df_lta.rolling(7).mean()
+        dfl = df_lta.values.tolist()
         selected_erea = sorted(selected_erea)
         df_xx = pd.DataFrame(dfl,columns=selected_erea)
-        df_xx = df_xx.set_index(df_h)
+        df_xx = df_xx.set_index(data_index)
 
         df_xx1 = df_xx
 
         df = df_d[(df_d['都道府県'].isin(selected_erea))]
 
-        df_1 = df.T
-        df_1 = df_1.drop(['都道府県','合計'],axis=0)
-        df_1 = df_1.rolling(7).mean()
-        dfl = df_1.values.tolist()
+        df_lt = df.T
+        df_lta = df_lt.drop(['都道府県','合計'],axis=0)
+        df_lta['date'] = dateList_date
+        df_lta = df_lta[(df_lta['date'] >= dateF) & (df_lta['date'] <= dateT)]
+
+        data_index = df_lta['date']
+
+        df_lta = df_lta.rolling(7).mean()
+        dfl = df_lta.values.tolist()
         selected_erea = sorted(selected_erea)
         df_xx = pd.DataFrame(dfl,columns=selected_erea)
-        df_xx = df_xx.set_index(df_h)
+        df_xx = df_xx.set_index(data_index)
 
         df_xx2 = df_xx
 
