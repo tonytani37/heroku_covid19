@@ -10,33 +10,33 @@ from datetime import datetime, timedelta, timezone
 
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)
 def data_load():
-    url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    # url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
         
-#     json_open = open('file\summary.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file\summary.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
     
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)  
 def tokyo_data():
-    url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+    # url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
 
-#     json_open = open('file/tokyo.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file/tokyo.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
 
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)    
 def line_set(df,days):
@@ -337,53 +337,51 @@ def main():
         erea_list = list(df_l['都道府県'].unique())
         selected_erea = st.multiselect('都道府県を選択してください', erea_list, default=erea_list[:5])
         df = df_l[(df_l['都道府県'].isin(selected_erea))]
-
-        df_lt = df.T
-        df_lta = df_lt.drop(['都道府県','合計'],axis=0)
-        df_lta['date'] = dateList_date
-        df_lta = df_lta[(df_lta['date'] >= dateF) & (df_lta['date'] <= dateT)]
-
-        data_index = df_lta['date']
-        
-        df_lta = df_lta.rolling(7).mean()
-        dfl = df_lta.values.tolist()
-        selected_erea = sorted(selected_erea)
-        df_xx = pd.DataFrame(dfl,columns=selected_erea)
-        df_xx = df_xx.set_index(data_index)
-
-        df_xx1 = df_xx
-
-        df = df_d[(df_d['都道府県'].isin(selected_erea))]
-
-        df_lt = df.T
-        df_lta = df_lt.drop(['都道府県','合計'],axis=0)
-        df_lta['date'] = dateList_date
-        df_lta = df_lta[(df_lta['date'] >= dateF) & (df_lta['date'] <= dateT)]
-
-        data_index = df_lta['date']
-
-        df_lta = df_lta.rolling(7).mean()
-        dfl = df_lta.values.tolist()
-        selected_erea = sorted(selected_erea)
-        df_xx = pd.DataFrame(dfl,columns=selected_erea)
-        df_xx = df_xx.set_index(data_index)
-
-        df_xx2 = df_xx
-
-        """
-        ### 都道府県別感染者数(移動平均)
-        """
         if len(df) > 0:
+            df_lt = df.T
+            df_lta = df_lt.drop(['都道府県','合計'],axis=0)
+            df_lta['date'] = dateList_date
+            df_lta = df_lta[(df_lta['date'] >= dateF) & (df_lta['date'] <= dateT)]
+
+            data_index = df_lta['date']
+            
+            df_lta = df_lta.rolling(7).mean()
+            dfl = df_lta.values.tolist()
+            selected_erea = sorted(selected_erea)
+            df_xx = pd.DataFrame(dfl,columns=selected_erea)
+            df_xx = df_xx.set_index(data_index)
+
+            df_xx1 = df_xx
+
+            df = df_d[(df_d['都道府県'].isin(selected_erea))]
+
+            df_lt = df.T
+            df_lta = df_lt.drop(['都道府県','合計'],axis=0)
+            df_lta['date'] = dateList_date
+            df_lta = df_lta[(df_lta['date'] >= dateF) & (df_lta['date'] <= dateT)]
+
+            data_index = df_lta['date']
+
+            df_lta = df_lta.rolling(7).mean()
+            dfl = df_lta.values.tolist()
+            selected_erea = sorted(selected_erea)
+            df_xx = pd.DataFrame(dfl,columns=selected_erea)
+            df_xx = df_xx.set_index(data_index)
+
+            df_xx2 = df_xx
+
+            """
+            ### 都道府県別感染者数(移動平均)
+            """
             st.line_chart(df_xx1,use_container_width=True)
-        else:
-            st.write('対象の都道府県を選択してください')
-        """
-        ### 都道府県別死亡者数(移動平均)
-        """
-        if len(df) > 0:
+            """
+            ### 都道府県別死亡者数(移動平均)
+            """
             st.line_chart(df_xx2,use_container_width=True)
         else:
-            st.write('対象の都道府県を選択してください')
+            """
+            ## グラフ表示対象の都道府県が指定されていません
+            """
 
         """
         ### 都道府県別感染者・死亡者関連データ
