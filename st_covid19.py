@@ -112,6 +112,11 @@ def data_set(summary_json):
     else:
         df_total['　　死亡者　　'] = df_p.iloc[:,-1]
 
+    ## 死亡者合計
+    df_ps = df_p.drop(['都道府県',"合計"],axis=1)
+    df_ps = df_ps.T
+    df_ps['死亡者'] = df_ps.sum(axis=1)
+
     collist = [
             'date',
             "confirmed",
@@ -209,16 +214,7 @@ def data_set(summary_json):
     ax1.legend()
     plt.grid(True)
 
-## 死亡者合計(作業中)
-    # df_ps = df_p.drop(['都道府県',"合計"],axis=1)
-    # df_ps = df_ps.T
-    figd = plt.figure()
-    # ax = figt.add_subplot(1,1,1)
-
-    # ax.plot(df_a['日付'],df_ps[0])
-
-## 死亡者合計
-
+## 東京都
 
     summary_json_t = tokyo_data()
  
@@ -252,12 +248,12 @@ def data_set(summary_json):
     ax1.set_ylabel("感染者比率")
     ax.set＿ylabel('感染者（人）')
     
-    return fig,fig3,figt,df_show,update,df_l,df_p,df,df_total,figd
+    return fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total
 
 def main():
     DAYS = 300 #グラフ化する日数指定
     summary_json = data_load()
-    fig,fig3,figt,df_show,update,df_l,df_d,df,df_total,figd = data_set(summary_json)
+    fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total = data_set(summary_json)
 
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader(update)
@@ -266,9 +262,12 @@ def main():
         '選択してください',
         ('全国感染者情報', '都道府県感染者情報', '東京都感染率')
         )
-    
+    st.sidebar.write(' ')
     st.sidebar.write('このサイトでは「日本国内の新型コロナウイルス (COVID-19) 感染状況追跡」(https://covid19japan.com)で作成されたデータを利用してます')
+    st.sidebar.write(' ')
     st.sidebar.write('当日データは順次更新されますので、確定値はない場合があります')
+    st.sidebar.write(' ')
+    st.sidebar.write('streamlitで作成中')
     
     if option == '全国感染者情報':
         """
@@ -287,13 +286,10 @@ def main():
         st.write(
             'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
             )
-
-        # """
-        # ### 国内死亡者数（移動平均）
-        # """
-        
-        # st.pyplot(figd)
-     
+        """
+        ### 国内死亡者数（移動平均）
+        """
+        st.line_chart(df_ps['死亡者'].rolling(7).mean())
         
     elif option == '都道府県感染者情報':
         """
@@ -343,7 +339,7 @@ def main():
 
             df_xx1 = df_xx
 
-            df = df_d[(df_d['都道府県'].isin(selected_erea))]
+            df = df_p[(df_p['都道府県'].isin(selected_erea))]
 
             df_lt = df.T
             df_lta = df_lt.drop(['都道府県','合計'],axis=0)
