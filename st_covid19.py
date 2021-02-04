@@ -8,53 +8,110 @@ import matplotlib.pyplot as plt
 import japanize_matplotlib
 from datetime import datetime, timedelta, timezone
 
+DAYS = 300 #グラフ化する日数指定
+
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)
 def data_load():
-    url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    # url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
         
-#     json_open = open('file\summary.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file\summary.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
     
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)  
 def tokyo_data():
-    url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+    # url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
 
-#     json_open = open('file/tokyo.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file/tokyo.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
 
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)    
-def line_set(df,days):
-    if datetime(2020,4,7) > min(df['日付'].tail(days)):
+def line_set(df,DAYS):
+    if datetime(2020,4,7) > min(df['日付'].tail(DAYS)):
         plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
-    if datetime(2020,4,21) > min(df['日付'].tail(days)):
+    if datetime(2020,4,21) > min(df['日付'].tail(DAYS)):
         plt.axvline(x=datetime(2020,4,21), color='blue', ls='--')
-    if datetime(2020,10,1) > min(df['日付'].tail(days)):
+    if datetime(2020,10,1) > min(df['日付'].tail(DAYS)):
         plt.axvline(x=datetime(2020,10,1), color='gray', ls='--')
-    if datetime(2020,7,22) > min(df['日付'].tail(days)):
+    if datetime(2020,7,22) > min(df['日付'].tail(DAYS)):
         plt.axvline(x=datetime(2020,7,22), color='gray', ls='--')
-    if datetime(2021,1,8) > min(df['日付'].tail(days)):
+    if datetime(2021,1,8) > min(df['日付'].tail(DAYS)):
         plt.axvline(x=datetime(2021,1,8), color='red', ls='--')
-    if datetime(2021,1,22) > min(df['日付'].tail(days)):
+    if datetime(2021,1,22) > min(df['日付'].tail(DAYS)):
         plt.axvline(x=datetime(2021,1,22), color='blue', ls='--')
 
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)    
 def data_set(summary_json):
+# ### 都道府県別感染者数（移動平均）
+    datalist = [
+                [row['date']
+                ] 
+                for row in summary_json['daily']
+                ]
+
+    df_h = pd.DataFrame(datalist,columns=['日付'])
+    df_h = pd.to_datetime(df_h['日付'])
+    df_h = df_h[-300:]
+
+    data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
+#     data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
+    data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
+    data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
+
+    data_ls = []
+    for row in data_l: # DAYSで指定された日数分だけ抜き出し
+        data_ls.append(row[-DAYS:])
+    df_l = pd.DataFrame(data_ls,columns=df_h)
+
+    df_s = []
+    for row in data_l: #全部合計
+        df_s.append(sum(row))
+
+    df_l.insert(0,'都道府県',pd.DataFrame(data_n))
+    df_l.insert(1,'合計',pd.DataFrame(df_s))
+
+    ## 都道府県別の感染者合計と直近の感染者数をDataFrameにコピーする ##
+    df_total = pd.DataFrame(data_n,columns={'都道府県'})
+    df_total['　　感染者計　'] =  pd.DataFrame(df_s)
+    if df_l.iloc[:,-1].sum() == 0:
+        df_total['　　感染者　　'] = df_l.iloc[:,-2]
+    else:
+        df_total['　　感染者　　'] = df_l.iloc[:,-1]
+
+    # ### 都道府県別死亡者数（移動平均）
+    data_ds = []
+    for row in data_d:
+        data_ds.append(row[-DAYS:])
+
+    df_p = pd.DataFrame(data_ds,columns=df_h)
+    df_s = []
+    for row in data_d:
+        df_s.append(sum(row))
+
+    df_p.insert(0,'都道府県',pd.DataFrame(data_n))
+    df_p.insert(1,'合計',pd.DataFrame(df_s))
+
+    df_total['　　死亡者計　'] =  pd.DataFrame(df_s)
+    if df_p.iloc[:,-1].sum() == 0:
+        df_total['　　死亡者　　'] = df_p.iloc[:,-2]
+    else:
+        df_total['　　死亡者　　'] = df_p.iloc[:,-1]
+
     collist = [
             'date',
             "confirmed",
@@ -92,7 +149,6 @@ def data_set(summary_json):
     df = df.drop(0)
 
     df_a = df[['date','confirmed','confirmedAvg7d',"criticalCumulative"]].copy() #dataframeはcopyしないとワーニングが出る
-    df_ｃ = df['confirmedAvg7d'].copy() #dataframeはcopyしないとワーニングが出る
 
     df_t = df['testedCumulative'].diff()
 
@@ -101,7 +157,6 @@ def data_set(summary_json):
     df_a['検査数移動平均'] = df_ta
 
     df_a = df_a.rename(
-        # columns={'confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均'})
         columns={'date':'日付','confirmed':"感染者数",'confirmedAvg7d':'感染者数移動平均',"criticalCumulative":'重症者数'}
         )
 
@@ -112,17 +167,14 @@ def data_set(summary_json):
     df_show = df_a.copy()
     df_show['日付'] = df_bd
     df_a['日付'] = df_d
-    # df_df = df_d.iloc[0]
-
-    days = 300 #グラフ化する日数指定
 
     fig, ax1 = plt.subplots(figsize=(12,8))
     ax2 = ax1.twinx()
-    ax1.bar(df_a['日付'].tail(days),df_a['感染者数'].tail(days),label='日次感染者数',color='lightgray')
-    ax1.plot(df_a['日付'].tail(days),df_a['感染者数移動平均'].tail(days),label='感染者数移動平均',color='red',linewidth=2)
-    ax2.plot(df_a['日付'].tail(days),df_a['検査数移動平均'].tail(days),label='検査数移動平均',color='green',linewidth=2)
+    ax1.bar(df_a['日付'].tail(DAYS),df_a['感染者数'].tail(DAYS),label='日次感染者数',color='lightgray')
+    ax1.plot(df_a['日付'].tail(DAYS),df_a['感染者数移動平均'].tail(DAYS),label='感染者数移動平均',color='red',linewidth=2)
+    ax2.plot(df_a['日付'].tail(DAYS),df_a['検査数移動平均'].tail(DAYS),label='検査数移動平均',color='green',linewidth=2)
 
-    line_set(df_a,days)
+    line_set(df_a,DAYS)
 
     title = "国内感染者数推移（日毎 移動平均)  {}".format(update)
     ax1.set_title(title)
@@ -137,11 +189,6 @@ def data_set(summary_json):
     ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
     plt.grid(True)
 
-    # df_cr = df[['date',"criticalCumulative"]]
-
-    # df_b = df_cr.rename(
-    #     columns={'date':'日付',"criticalCumulative":'重症者数'})
-
     df_d = pd.to_datetime(df_a['日付'])
     df_a = df_a.drop('日付',axis=1)
     df_a = df_a.fillna(0).astype(int)
@@ -149,9 +196,9 @@ def data_set(summary_json):
 
     fig3, ax1 = plt.subplots(figsize=(12,8))
 
-    ax1.plot(df_a['日付'].tail(days),df_a['重症者数'].tail(days),label='重症者数',color='green')
+    ax1.plot(df_a['日付'].tail(DAYS),df_a['重症者数'].tail(DAYS),label='重症者数',color='green')
 
-    line_set(df_a,days)
+    line_set(df_a,DAYS)
 
     title = "国内重傷者数 {}".format(update)
     ax1.set_title(title)
@@ -162,30 +209,19 @@ def data_set(summary_json):
     ax1.legend()
     plt.grid(True)
 
-    data_n = [row['name_ja'] for row in summary_json['prefectures']] #都道府県名
-#     data_n = [row['name'] for row in summary_json['prefectures']] #都道府県名
-    data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
-    data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
+## 死亡者合計(作業中)
+    # df_ps = df_p.drop(['都道府県',"合計"],axis=1)
+    # df_ps = df_ps.T
+    figd = plt.figure()
+    # ax = figt.add_subplot(1,1,1)
 
-    import datetime as dt
+    # ax.plot(df_a['日付'],df_ps[0])
 
-    s_day = '2020-01-08' #開始日
-    # s_day = '2020-01-18' #開始日
+## 死亡者合計
 
-    date_time = pd.to_datetime(df_d.iloc[-1])
-    today = date_time.strftime("%Y-%m-%d")
-    date_index = pd.date_range(s_day , today, freq="d")
-    date_idx = ["{0:%Y-%m-%d}".format(row) for row in date_index]
-    date_idx = date_idx[-days:]
-    df_date = pd.DataFrame(date_idx,columns=['日付'])
-
-    df_date = df_date['日付']
-    df_n = pd.DataFrame(data_n)
 
     summary_json_t = tokyo_data()
-
-    colist = ['日付','感染率']
-
+ 
     df_d = pd.DataFrame([row['diagnosed_date']] for row in summary_json_t['data'])
     df_r = pd.DataFrame([row['weekly_gain_ratio'],row['count']] for row in summary_json_t['data'])
 
@@ -196,7 +232,7 @@ def data_set(summary_json):
 
     df = df_r.rename(columns={0:'感染率',1:'感染者数'}).copy()
 
-    df = df.tail(days)
+    df = df.tail(DAYS)
 
     figt = plt.figure(figsize=(12,6))
     ax = figt.add_subplot(1,1,1)
@@ -206,9 +242,7 @@ def data_set(summary_json):
     ax1.plot(df['日付'],df['感染率'])
     ax1.hlines(y=1,xmin=min(df['日付']),xmax=max(df['日付']),color='red')
 
-    # import datetime as dt
-    # kd = dt.datetime(2021,1,8)
-    line_set(df,days)
+    line_set(df,DAYS)
 
     plt.grid(True)
     title = "東京都感染者比率"
@@ -217,71 +251,13 @@ def data_set(summary_json):
     ax.set_xlabel('日付')
     ax1.set_ylabel("感染者比率")
     ax.set＿ylabel('感染者（人）')
-
-    # ### 都道府県別感染者数（移動平均）
-    datalist = [
-                [row['date']
-                ] 
-                for row in summary_json['daily']
-                ]
-
-    df_h = pd.DataFrame(datalist,columns=['日付'])
-    df_h = pd.to_datetime(df_h['日付'])
-    df_h = df_h[-300:]
-
-    data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
-#     data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
-    data_l = [row['dailyConfirmedCount'] for row in summary_json['prefectures']] #感染者数
-    data_d = [row['dailyDeceasedCount'] for row in summary_json['prefectures']] #死亡者数
-
-    data_ls = []
-    for row in data_l: # daysで指定された日数分だけ抜き出し
-        data_ls.append(row[-days:])
-    df_l = pd.DataFrame(data_ls,columns=df_h)
-
-    df_s = []
-    for row in data_l: #全部合計
-        df_s.append(sum(row))
-
-    df_l.insert(0,'都道府県',pd.DataFrame(data_n))
-    df_l.insert(1,'合計',pd.DataFrame(df_s))
-    # df_l.insert(0,'date',df_h)
-
-    ## 都道府県別の感染者合計と直近の感染者数をDataFrameにコピーする ##
-    # df_total = df_l.iloc[:,-1]
-    df_total = pd.DataFrame(data_n,columns={'都道府県'})
-    df_total['　　感染者計　'] =  pd.DataFrame(df_s)
-    if df_l.iloc[:,-1].sum() == 0:
-        df_total['　　感染者　　'] = df_l.iloc[:,-2]
-    else:
-        df_total['　　感染者　　'] = df_l.iloc[:,-1]
-    #####
-    # ### 都道府県別死亡者数（移動平均）
-    data_ds = []
-    for row in data_d:
-        data_ds.append(row[-days:])
-
-    df_d = pd.DataFrame(data_ds,columns=df_h)
-    df_s = []
-    for row in data_d:
-        df_s.append(sum(row))
-
-    df_d.insert(0,'都道府県',pd.DataFrame(data_n))
-    df_d.insert(1,'合計',pd.DataFrame(df_s))
-
-    df_total['　　死亡者計　'] =  pd.DataFrame(df_s)
-    if df_d.iloc[:,-1].sum() == 0:
-        df_total['　　死亡者　　'] = df_d.iloc[:,-2]
-    else:
-        df_total['　　死亡者　　'] = df_d.iloc[:,-1]
-
     
-    return fig,fig3,figt,df_show,update,df_l,df_d,df,df_h,df_total
+    return fig,fig3,figt,df_show,update,df_l,df_p,df,df_total,figd
 
 def main():
-    days = 300 #グラフ化する日数指定
+    DAYS = 300 #グラフ化する日数指定
     summary_json = data_load()
-    fig,fig3,figt,df_show,update,df_l,df_d,df,df_h,df_total = data_set(summary_json)
+    fig,fig3,figt,df_show,update,df_l,df_d,df,df_total,figd = data_set(summary_json)
 
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader(update)
@@ -311,6 +287,14 @@ def main():
         st.write(
             'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
             )
+
+        # """
+        # ### 国内死亡者数（移動平均）
+        # """
+        
+        # st.pyplot(figd)
+     
+        
     elif option == '都道府県感染者情報':
         """
         ## 都道府県感染者情報
@@ -318,7 +302,7 @@ def main():
         dateList = [row['date'] for row in summary_json['daily']]
 
         df_date = pd.to_datetime(dateList)
-        dateList_date = [datetime(row.year,row.month,row.day) for row in df_date[-days:]]
+        dateList_date = [datetime(row.year,row.month,row.day) for row in df_date[-DAYS:]]
 
         dateFrom = dateList_date[0]
         dateTo = dateList_date[-1]
@@ -333,6 +317,11 @@ def main():
         
         st.write('表示期間 ',str(dateF.year)+'/'+str(dateF.month)+'/'+str(dateF.day),
         '<------>',str(dateT.year)+'/'+str(dateT.month)+'/'+str(dateT.day))
+
+        radio = st.radio('対象データ',(('移動平均'
+                                        ,'実数'
+                                        ,'実数(積み上げ棒グラフ）'
+                                        )))
         
         erea_list = list(df_l['都道府県'].unique())
         selected_erea = st.multiselect('都道府県を選択してください', erea_list, default=erea_list[:5])
@@ -344,8 +333,9 @@ def main():
             df_lta = df_lta[(df_lta['date'] >= dateF) & (df_lta['date'] <= dateT)]
 
             data_index = df_lta['date']
-            
-            df_lta = df_lta.rolling(7).mean()
+            df_lta = df_lta.drop('date',axis=1)
+            if radio == '移動平均':
+                df_lta = df_lta.rolling(7).mean()
             dfl = df_lta.values.tolist()
             selected_erea = sorted(selected_erea)
             df_xx = pd.DataFrame(dfl,columns=selected_erea)
@@ -361,8 +351,9 @@ def main():
             df_lta = df_lta[(df_lta['date'] >= dateF) & (df_lta['date'] <= dateT)]
 
             data_index = df_lta['date']
-
-            df_lta = df_lta.rolling(7).mean()
+            df_lta = df_lta.drop('date',axis=1)
+            if radio == '移動平均':
+                df_lta = df_lta.rolling(7).mean()
             dfl = df_lta.values.tolist()
             selected_erea = sorted(selected_erea)
             df_xx = pd.DataFrame(dfl,columns=selected_erea)
@@ -371,13 +362,23 @@ def main():
             df_xx2 = df_xx
 
             """
-            ### 都道府県別感染者数(移動平均)
+            ### 都道府県別感染者数
             """
-            st.line_chart(df_xx1,use_container_width=True)
+            if radio == '移動平均':
+                st.line_chart(df_xx1,use_container_width=True)
+            elif radio == '実数':
+                st.line_chart(df_xx1,use_container_width=True)
+            else:
+                st.bar_chart(df_xx1,use_container_width=True)
             """
-            ### 都道府県別死亡者数(移動平均)
+            ### 都道府県別死亡者数
             """
-            st.line_chart(df_xx2,use_container_width=True)
+            if radio == '移動平均':
+                st.line_chart(df_xx2,use_container_width=True)
+            elif radio == '実数':
+                st.line_chart(df_xx2,use_container_width=True)
+            else:
+                st.bar_chart(df_xx2,use_container_width=True)
         else:
             """
             ## グラフ表示対象の都道府県が指定されていません
