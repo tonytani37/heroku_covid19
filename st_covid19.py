@@ -266,6 +266,7 @@ def main():
     st.sidebar.write('このサイトでは「日本国内の新型コロナウイルス (COVID-19) 感染状況追跡」(https://covid19japan.com)で作成されたデータを利用してます')
     st.sidebar.write(' ')
     st.sidebar.write('当日データは順次更新されますので、確定値はない場合があります')
+    st.sidebar.write('公式発表数値と異なる場合があります')
     st.sidebar.write(' ')
     st.sidebar.write('streamlitで作成中')
     
