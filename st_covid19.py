@@ -10,7 +10,8 @@ from datetime import datetime, timedelta, timezone
 
 DAYS = 300 #グラフ化する日数指定
 
-@st.cache(allow_output_mutation=True, suppress_st_warning=True)
+# @st.cache(allow_output_mutation=True, suppress_st_warning=True)
+@st.cache()
 def data_load():
     url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
@@ -25,7 +26,8 @@ def data_load():
 #     summary_json = json.load(json_open)
 #     return summary_json
     
-@st.cache(allow_output_mutation=True, suppress_st_warning=True)  
+# @st.cache(allow_output_mutation=True, suppress_st_warning=True)  
+@st.cache()  
 def tokyo_data():
     url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
@@ -40,7 +42,7 @@ def tokyo_data():
 #     summary_json = json.load(json_open)
 #     return summary_json
 
-@st.cache(allow_output_mutation=True, suppress_st_warning=True)    
+# @st.cache(allow_output_mutation=True, suppress_st_warning=True)   
 def line_set(df,DAYS):
     if datetime(2020,4,7) > min(df['日付'].tail(DAYS)):
         plt.axvline(x=datetime(2020,4,7), color='red', ls='--')
