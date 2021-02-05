@@ -13,34 +13,34 @@ DAYS = 300 #グラフ化する日数指定
 # @st.cache(allow_output_mutation=True, suppress_st_warning=True)
 @st.cache()
 def data_load():
-    url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
+    # url='https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
         
-#     json_open = open('file\summary.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file\summary.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
     
 # @st.cache(allow_output_mutation=True, suppress_st_warning=True)  
 @st.cache()  
 def tokyo_data():
-    url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
+    # url='https://raw.githubusercontent.com/tokyo-metropolitan-gov/covid19/development/data/daily_positive_detail.json'
 
-    try:
-        r = requests.get(url)
-        summary_json = json.loads(r.text)
-        return summary_json
-    except requests.exceptions.RequestException as err:
-        print(err)
+    # try:
+    #     r = requests.get(url)
+    #     summary_json = json.loads(r.text)
+    #     return summary_json
+    # except requests.exceptions.RequestException as err:
+    #     print(err)
 
-#     json_open = open('file/tokyo.json', 'r')
-#     summary_json = json.load(json_open)
-#     return summary_json
+    json_open = open('file/tokyo.json', 'r')
+    summary_json = json.load(json_open)
+    return summary_json
 
 # @st.cache(allow_output_mutation=True, suppress_st_warning=True)   
 def line_set(df,DAYS):
@@ -68,7 +68,7 @@ def data_set(summary_json):
 
     df_h = pd.DataFrame(datalist,columns=['日付'])
     df_h = pd.to_datetime(df_h['日付'])
-    df_h = df_h[-300:]
+    df_h = df_h[-DAYS:]
 
     data_n = [str(i+1).zfill(2)+':'+row['name_ja'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
 #     data_n = [str(i+1).zfill(2)+':'+row['name'] for i,row in enumerate(summary_json['prefectures'])] #都道府県名
@@ -118,6 +118,10 @@ def data_set(summary_json):
     df_ps = df_p.drop(['都道府県',"合計"],axis=1)
     df_ps = df_ps.T
     df_ps['死亡者'] = df_ps.sum(axis=1)
+    # if df_ps['死亡者'].iat[-1] == 0:
+    #     df_ps = df_ps.drop(df_ps.index[[len(df_ps)-1]])
+    # else:
+    #     df_ps = df_ps.drop(df_ps.index[[0]])
 
     collist = [
             'date',
@@ -171,8 +175,9 @@ def data_set(summary_json):
     df_d = pd.to_datetime(df_a['日付']).copy()
     df_a = df_a.drop('日付',axis=1)
     df_a = df_a.fillna(0).astype(int)
-    df_show = df_a.copy()
-    df_show['日付'] = df_bd
+    df_show = df_a.tail(DAYS).copy()
+    df_show['日付'] = df_bd.tail(DAYS)
+    df_show['死亡者数'] = df_ps['死亡者'].values
     df_a['日付'] = df_d
 
     fig, ax1 = plt.subplots(figsize=(12,8))
@@ -196,25 +201,28 @@ def data_set(summary_json):
     ax1.legend(hd1 + hd2, lb1 + lb2, loc='upper left')
     plt.grid(True)
 
-    df_d = pd.to_datetime(df_a['日付'])
-    df_a = df_a.drop('日付',axis=1)
-    df_a = df_a.fillna(0).astype(int)
-    df_a['日付'] = df_d
+    # df_d = pd.to_datetime(df_a['日付'])
+    # df_a = df_a.drop('日付',axis=1)
+    # df_a = df_a.fillna(0).astype(int)
+    # df_a['日付'] = df_d
 
     fig3, ax1 = plt.subplots(figsize=(12,8))
 
-    ax1.plot(df_a['日付'].tail(DAYS),df_a['重症者数'].tail(DAYS),label='重症者数',color='green')
+    # ax1.plot(df_a['日付'].tail(DAYS),df_a['重症者数'].tail(DAYS),label='重症者数',color='green')
 
-    line_set(df_a,DAYS)
+    # line_set(df_a,DAYS)
 
-    title = "国内重傷者数 {}".format(update)
-    ax1.set_title(title)
+    # title = "国内重傷者数 {}".format(update)
+    # ax1.set_title(title)
 
-    ax1.set_xlabel('日付')
-    ax1.set_ylabel("重傷者（人）")
+    # ax1.set_xlabel('日付')
+    # ax1.set_ylabel("重傷者（人）")
 
-    ax1.legend()
-    plt.grid(True)
+    # ax1.legend()
+    # plt.grid(True)
+
+    df_ps['重症者']= (df_a['重症者数'].tail(DAYS)).values
+
 
 ## 東京都
 
@@ -278,10 +286,20 @@ def main():
         ### 国内感染者数（移動平均）
         """
         st.pyplot(fig)
+        # """
+        # ### 国内重症者数
+        # """
+        # st.pyplot(fig3)
         """
         ### 国内重症者数
         """
-        st.pyplot(fig3)
+        st.line_chart(df_ps['重症者'])
+
+        """
+        ### 国内死亡者数（移動平均）
+        """
+        st.line_chart(df_ps['死亡者'].rolling(7).mean())
+
         """
         ### COVID-19感染者関連データ
         """
@@ -289,10 +307,6 @@ def main():
         st.write(
             'data: https://raw.githubusercontent.com/reustle/covid19japan-data/master/docs/summary/latest.json'
             )
-        """
-        ### 国内死亡者数（移動平均）
-        """
-        st.line_chart(df_ps['死亡者'].rolling(7).mean())
         
     elif option == '都道府県感染者情報':
         """
