@@ -225,20 +225,22 @@ def data_set(summary_json):
 
     df_ps['重症者']= (df_a['重症者数'].tail(DAYS)).values
 
-    figp = make_subplots(
-        rows=1, cols=2,
-        subplot_titles=("重症者", "死亡者(移動平均）")
-        )
+    df_ps['日付'] = df_a['日付'].tail(DAYS)
 
-    figp.add_trace(
-        go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['重症者'],name='重症者'),
-        row=1, col=1
-    )
+    # figp = make_subplots(
+    #     rows=1, cols=2,
+    #     subplot_titles=("重症者", "死亡者")
+    #     )
 
-    figp.add_trace(
-        go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['死亡者'].rolling(7).mean(),name='死亡者（移動平均）'),
-        row=1, col=2
-    )
+    # figp.add_trace(
+    #     go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['重症者'],name='重症者'),
+    #     row=1, col=1
+    # )
+
+    # figp.add_trace(
+    #     go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['死亡者'].rolling(7).mean(),name='死亡者（移動平均）'),
+    #     row=1, col=2
+    # )
 
 ## 東京都
 
@@ -274,12 +276,12 @@ def data_set(summary_json):
     ax1.set_ylabel("感染者比率")
     ax.set＿ylabel('感染者（人）')
     
-    return fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total,figp
+    return fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total,df_a
 
 def main():
     DAYS = 300 #グラフ化する日数指定
     summary_json = data_load()
-    fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total,figp = data_set(summary_json)
+    fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total,df_a = data_set(summary_json)
 
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader(update)
@@ -307,8 +309,31 @@ def main():
         # """
         # st.pyplot(fig3)
         """
-        ### 国内重症者数・死亡者（移動平均）
+        ### 国内重症者数・死亡者
         """
+        radio = st.radio('対象データ',(('移動平均'
+                                ,'実数'
+                                )))
+                                
+        figp = make_subplots(
+            rows=1, cols=2,
+            subplot_titles=("重症者", "死亡者")
+            )
+
+        figp.add_trace(
+            go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['重症者'],name='重症者'),
+            row=1, col=1
+        )
+        if radio == '移動平均':
+            df_pss = df_ps['死亡者'].rolling(7).mean()
+        else:
+            df_pss = df_ps['死亡者']
+
+        figp.add_trace(
+            go.Scatter(x=df_a['日付'].tail(DAYS),y=df_pss,name='死亡者'),
+            row=1, col=2
+        )
+        
         st.plotly_chart(figp)
         # """
         # ### 国内重症者数
