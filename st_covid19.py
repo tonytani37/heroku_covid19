@@ -231,12 +231,12 @@ def data_set(summary_json):
         )
 
     figp.add_trace(
-        go.Scatter(x=df_a['日付'],y=df_ps['重症者'],name='重症者'),
+        go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['重症者'],name='重症者'),
         row=1, col=1
     )
 
     figp.add_trace(
-        go.Scatter(x=df_a['日付'],y=df_ps['死亡者'].rolling(7).mean(),name='死亡者'),
+        go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['死亡者'].rolling(7).mean(),name='死亡者'),
         row=1, col=2
     )
 
