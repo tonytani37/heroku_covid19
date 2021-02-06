@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd 
 import numpy as np 
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import json
 import requests
 import matplotlib.pyplot as plt
@@ -223,6 +225,20 @@ def data_set(summary_json):
 
     df_ps['重症者']= (df_a['重症者数'].tail(DAYS)).values
 
+    figp = make_subplots(
+        rows=1, cols=2,
+        subplot_titles=("重症者", "死亡者")
+        )
+
+    figp.add_trace(
+        go.Scatter(x=df_a['日付'],y=df_ps['重症者'],name='重症者'),
+        row=1, col=1
+    )
+
+    figp.add_trace(
+        go.Scatter(x=df_a['日付'],y=df_ps['死亡者'].rolling(7).mean(),name='死亡者'),
+        row=1, col=2
+    )
 
 ## 東京都
 
@@ -258,12 +274,12 @@ def data_set(summary_json):
     ax1.set_ylabel("感染者比率")
     ax.set＿ylabel('感染者（人）')
     
-    return fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total
+    return fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total,figp
 
 def main():
     DAYS = 300 #グラフ化する日数指定
     summary_json = data_load()
-    fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total = data_set(summary_json)
+    fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total,figp = data_set(summary_json)
 
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader(update)
@@ -291,14 +307,18 @@ def main():
         # """
         # st.pyplot(fig3)
         """
-        ### 国内重症者数
+        ### 国内重症者数・死亡者
         """
-        st.line_chart(df_ps['重症者'])
+        st.plotly_chart(figp)
+        # """
+        # ### 国内重症者数
+        # """
+        # st.line_chart(df_ps['重症者'])
 
-        """
-        ### 国内死亡者数（移動平均）
-        """
-        st.line_chart(df_ps['死亡者'].rolling(7).mean())
+        # """
+        # ### 国内死亡者数（移動平均）
+        # """
+        # st.line_chart(df_ps['死亡者'].rolling(7).mean())
 
         """
         ### COVID-19感染者関連データ
