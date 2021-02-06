@@ -227,7 +227,7 @@ def data_set(summary_json):
 
     figp = make_subplots(
         rows=1, cols=2,
-        subplot_titles=("重症者", "死亡者")
+        subplot_titles=("重症者", "死亡者(移動平均）")
         )
 
     figp.add_trace(
@@ -236,7 +236,7 @@ def data_set(summary_json):
     )
 
     figp.add_trace(
-        go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['死亡者'].rolling(7).mean(),name='死亡者'),
+        go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['死亡者'].rolling(7).mean(),name='死亡者（移動平均）'),
         row=1, col=2
     )
 
@@ -307,7 +307,7 @@ def main():
         # """
         # st.pyplot(fig3)
         """
-        ### 国内重症者数・死亡者
+        ### 国内重症者数・死亡者（移動平均）
         """
         st.plotly_chart(figp)
         # """
