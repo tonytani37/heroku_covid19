@@ -284,7 +284,9 @@ def main():
     summary_json = data_load()
     fig,fig3,figt,df_show,update,df_l,df_d,df_p,df_ps,df,df_total,df_a = data_set(summary_json)
 
-    st.sidebar.title('COVID-19 全国感染者情報')
+    # st.sidebar.title('COVID-19 全国感染者情報')
+    title = Image.open('image/title.png')
+    st.sidebar.image(title,use_column_width=True)
     st.sidebar.subheader(update)
 
     option = st.sidebar.selectbox(
@@ -297,9 +299,9 @@ def main():
     st.sidebar.write('当日データは順次更新されますので、確定値はない場合があります')
     st.sidebar.write('公式発表数値と異なる場合があります')
     # st.sidebar.write(' ')
-    image = Image.open('image/amabie.png')
-    st.sidebar.image(image,width=100)
-    st.sidebar.write('streamlit、画像「かわピク」 https://www.kawapic.com/')
+    # image = Image.open('image/amabie.png')
+    # st.sidebar.image(image,width=100)
+    st.sidebar.write('画像「かわピク」 https://www.kawapic.com/')
     
     if option == '全国感染者情報':
         """
