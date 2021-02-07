@@ -9,6 +9,7 @@ import requests
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 from datetime import datetime, timedelta, timezone
+from PIL import Image
 
 DAYS = 300 #グラフ化する日数指定
 
@@ -285,6 +286,9 @@ def main():
 
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader(update)
+    image = Image.open('image/amabie.png')
+    st.sidebar.image(image,
+            width=100)
 
     option = st.sidebar.selectbox(
         '選択してください',
@@ -297,6 +301,7 @@ def main():
     st.sidebar.write('公式発表数値と異なる場合があります')
     st.sidebar.write(' ')
     st.sidebar.write('streamlitで作成中')
+    st.sidebar.text('「かわピク」 https://www.kawapic.com/')
     
     if option == '全国感染者情報':
         """
@@ -311,9 +316,9 @@ def main():
         """
         ### 国内重症者数・死亡者
         """
-        radio = st.radio('対象データ',(('移動平均'
-                                ,'実数'
-                                )))
+        # radio = st.radio('対象データ',(('移動平均'
+        #                         ,'実数'
+        #                         )))
                                 
         figp = make_subplots(
             rows=1, cols=2,
@@ -324,10 +329,10 @@ def main():
             go.Scatter(x=df_a['日付'].tail(DAYS),y=df_ps['重症者'],name='重症者'),
             row=1, col=1
         )
-        if radio == '移動平均':
-            df_pss = df_ps['死亡者'].rolling(7).mean()
-        else:
-            df_pss = df_ps['死亡者']
+        # if radio == '移動平均':
+        df_pss = df_ps['死亡者'].rolling(7).mean()
+        # else:
+        #     df_pss = df_ps['死亡者']
 
         figp.add_trace(
             go.Scatter(x=df_a['日付'].tail(DAYS),y=df_pss,name='死亡者'),
