@@ -359,6 +359,20 @@ def main():
             )
         
     elif option == '都道府県感染者情報':
+        def kjitai_area(erea_list):
+            list = ["埼玉県"
+                ,"千葉県"
+                ,"東京都"
+                ,"神奈川県"
+                ,"岐阜県"
+                ,"愛知県"
+                ,"京都府"
+                ,"大阪府"
+                ,"兵庫県"
+                ,"福岡県"
+            ]
+            return [row for row in erea_list if row[3:] in list]
+
         """
         ## 都道府県感染者情報
         """
@@ -387,7 +401,9 @@ def main():
                                         )))
         
         erea_list = list(df_l['都道府県'].unique())
-        selected_erea = st.multiselect('都道府県を選択してください', erea_list, default=erea_list[:5])
+        kjitai_ereas = kjitai_area(erea_list)
+        # selected_erea = st.multiselect('都道府県を選択してください', erea_list, default=erea_list[:5])
+        selected_erea = st.multiselect('都道府県を選択してください', erea_list, default=kjitai_ereas)
         df = df_l[(df_l['都道府県'].isin(selected_erea))]
         if len(df) > 0:
             df_lt = df.T
