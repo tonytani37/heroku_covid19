@@ -286,22 +286,20 @@ def main():
 
     st.sidebar.title('COVID-19 全国感染者情報')
     st.sidebar.subheader(update)
-    image = Image.open('image/amabie.png')
-    st.sidebar.image(image,
-            width=100)
 
     option = st.sidebar.selectbox(
         '選択してください',
         ('全国感染者情報', '都道府県感染者情報', '東京都感染率')
         )
-    st.sidebar.write(' ')
+    # st.sidebar.write(' ')
     st.sidebar.write('このサイトでは「日本国内の新型コロナウイルス (COVID-19) 感染状況追跡」(https://covid19japan.com)で作成されたデータを利用してます')
-    st.sidebar.write(' ')
+    # st.sidebar.write(' ')
     st.sidebar.write('当日データは順次更新されますので、確定値はない場合があります')
     st.sidebar.write('公式発表数値と異なる場合があります')
-    st.sidebar.write(' ')
-    st.sidebar.write('streamlitで作成中')
-    st.sidebar.text('「かわピク」 https://www.kawapic.com/')
+    # st.sidebar.write(' ')
+    image = Image.open('image/amabie.png')
+    st.sidebar.image(image,width=100)
+    st.sidebar.write('streamlit、画像「かわピク」 https://www.kawapic.com/')
     
     if option == '全国感染者情報':
         """
