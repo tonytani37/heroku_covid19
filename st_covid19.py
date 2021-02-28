@@ -380,6 +380,7 @@ if __name__ == "__main__":
         """
         # COVID-19感染者関連データ
         """
+        df_show = df_show.sort_values('日付', ascending=False)
         st.dataframe(df_show[['日付', '感染者数', '検査数', '重症者数', '感染者数移動平均',
                               '検査数移動平均']].style.highlight_max(axis=0), height=400)
         st.write(
